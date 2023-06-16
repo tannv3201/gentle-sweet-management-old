@@ -112,14 +112,14 @@ export default function BookingDetailList({ isEditting }) {
                             </LightTooltip>
                         )}
                     </div>
-                    {getBooking?.status < 3 && user?.role_id === 1 && (
+                    {/* {getBooking?.status < 3 && user?.role_id === 1 && (
                         <GButton
                             onClick={handleOpenAddServicePopup}
                             color={"success"}
                         >
                             Thêm dịch vụ
                         </GButton>
-                    )}
+                    )} */}
                 </div>
                 {getBookingDetail?.length !== 0 ? (
                     <GTable
@@ -162,74 +162,74 @@ export default function BookingDetailList({ isEditting }) {
                                 title: "Ghi chú",
                                 field: "description",
                             },
-                            {
-                                title: "Thao tác",
-                                field: "actions",
-                                sorting: false,
-                                hidden: user?.role_id === 1 ? false : true,
-                                export: false,
-                                render: (rowData) => (
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <LightTooltip
-                                            placement="bottom"
-                                            title="Chi tiết"
-                                        >
-                                            <span>
-                                                <IconButton
-                                                    disabled={
-                                                        getBooking?.status > 2
-                                                    }
-                                                    onClick={() =>
-                                                        handleOpenUpdateServicePopup(
-                                                            rowData
-                                                        )
-                                                    }
-                                                >
-                                                    <EditRounded
-                                                        color={
-                                                            getBooking?.status >
-                                                            2
-                                                                ? "neutral"
-                                                                : "primary"
-                                                        }
-                                                    />
-                                                </IconButton>
-                                            </span>
-                                        </LightTooltip>
-                                        <LightTooltip
-                                            placement="bottom"
-                                            title="Xóa"
-                                        >
-                                            <span>
-                                                <IconButton
-                                                    disabled={
-                                                        getBooking?.status > 2
-                                                    }
-                                                    onClick={() => {
-                                                        handleOpenDeleteConfirmPopup(
-                                                            rowData
-                                                        );
-                                                    }}
-                                                >
-                                                    <DeleteRoundedIcon
-                                                        color={
-                                                            getBooking?.status >
-                                                            2
-                                                                ? "neutral"
-                                                                : "error"
-                                                        }
-                                                    />
-                                                </IconButton>
-                                            </span>
-                                        </LightTooltip>
-                                    </div>
-                                ),
-                            },
+                            // {
+                            //     title: "Thao tác",
+                            //     field: "actions",
+                            //     sorting: false,
+                            //     hidden: user?.role_id === 1 ? false : true,
+                            //     export: false,
+                            //     render: (rowData) => (
+                            //         <div
+                            //             style={{
+                            //                 display: "flex",
+                            //                 alignItems: "center",
+                            //             }}
+                            //         >
+                            //             <LightTooltip
+                            //                 placement="bottom"
+                            //                 title="Chi tiết"
+                            //             >
+                            //                 <span>
+                            //                     <IconButton
+                            //                         disabled={
+                            //                             getBooking?.status > 2
+                            //                         }
+                            //                         onClick={() =>
+                            //                             handleOpenUpdateServicePopup(
+                            //                                 rowData
+                            //                             )
+                            //                         }
+                            //                     >
+                            //                         <EditRounded
+                            //                             color={
+                            //                                 getBooking?.status >
+                            //                                 2
+                            //                                     ? "neutral"
+                            //                                     : "primary"
+                            //                             }
+                            //                         />
+                            //                     </IconButton>
+                            //                 </span>
+                            //             </LightTooltip>
+                            //             <LightTooltip
+                            //                 placement="bottom"
+                            //                 title="Xóa"
+                            //             >
+                            //                 <span>
+                            //                     <IconButton
+                            //                         disabled={
+                            //                             getBooking?.status > 2
+                            //                         }
+                            //                         onClick={() => {
+                            //                             handleOpenDeleteConfirmPopup(
+                            //                                 rowData
+                            //                             );
+                            //                         }}
+                            //                     >
+                            //                         <DeleteRoundedIcon
+                            //                             color={
+                            //                                 getBooking?.status >
+                            //                                 2
+                            //                                     ? "neutral"
+                            //                                     : "error"
+                            //                             }
+                            //                         />
+                            //                     </IconButton>
+                            //                 </span>
+                            //             </LightTooltip>
+                            //         </div>
+                            //     ),
+                            // },
                         ]}
                         data={cloneData || []}
                         exportFileName={"DanhSachNguoiDung"}
