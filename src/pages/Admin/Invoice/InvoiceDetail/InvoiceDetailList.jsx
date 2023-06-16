@@ -108,14 +108,14 @@ export default function InvoiceDetailList({ isEditting }) {
                         )}
                     </div>
                     {/* {isEditting && ( */}
-                    {getInvoice?.status < 3 && user?.role_id === 1 && (
+                    {/* {getInvoice?.status < 3 && user?.role_id === 1 && (
                         <GButton
                             onClick={handleOpenAddProductPopup}
                             color={"success"}
                         >
                             Thêm sản phẩm
                         </GButton>
-                    )}
+                    )} */}
                     {/* )} */}
                 </div>
                 {getInvoiceDetail?.length !== 0 ? (
@@ -145,74 +145,74 @@ export default function InvoiceDetailList({ isEditting }) {
                                     return FormatCurrency(rowData?.price_total);
                                 },
                             },
-                            {
-                                title: "Thao tác",
-                                field: "actions",
-                                sorting: false,
-                                export: false,
-                                hidden: user?.role_id === 1 ? false : true,
-                                render: (rowData) => (
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            alignItems: "center",
-                                        }}
-                                    >
-                                        <LightTooltip
-                                            placement="bottom"
-                                            title="Chi tiết"
-                                        >
-                                            <span>
-                                                <IconButton
-                                                    disabled={
-                                                        getInvoice?.status > 2
-                                                    }
-                                                    onClick={() =>
-                                                        handleOpenUpdateProductPopup(
-                                                            rowData
-                                                        )
-                                                    }
-                                                >
-                                                    <EditRounded
-                                                        color={
-                                                            getInvoice?.status >
-                                                            2
-                                                                ? "neutral"
-                                                                : "primary"
-                                                        }
-                                                    />
-                                                </IconButton>
-                                            </span>
-                                        </LightTooltip>
-                                        <LightTooltip
-                                            placement="bottom"
-                                            title="Xóa"
-                                        >
-                                            <span>
-                                                <IconButton
-                                                    disabled={
-                                                        getInvoice?.status > 2
-                                                    }
-                                                    onClick={() => {
-                                                        handleOpenDeleteConfirmPopup(
-                                                            rowData
-                                                        );
-                                                    }}
-                                                >
-                                                    <DeleteRoundedIcon
-                                                        color={
-                                                            getInvoice?.status >
-                                                            2
-                                                                ? "neutral"
-                                                                : "error"
-                                                        }
-                                                    />
-                                                </IconButton>
-                                            </span>
-                                        </LightTooltip>
-                                    </div>
-                                ),
-                            },
+                            // {
+                            //     title: "Thao tác",
+                            //     field: "actions",
+                            //     sorting: false,
+                            //     export: false,
+                            //     hidden: user?.role_id === 1 ? false : true,
+                            //     render: (rowData) => (
+                            //         <div
+                            //             style={{
+                            //                 display: "flex",
+                            //                 alignItems: "center",
+                            //             }}
+                            //         >
+                            //             <LightTooltip
+                            //                 placement="bottom"
+                            //                 title="Chi tiết"
+                            //             >
+                            //                 <span>
+                            //                     <IconButton
+                            //                         disabled={
+                            //                             getInvoice?.status > 2
+                            //                         }
+                            //                         onClick={() =>
+                            //                             handleOpenUpdateProductPopup(
+                            //                                 rowData
+                            //                             )
+                            //                         }
+                            //                     >
+                            //                         <EditRounded
+                            //                             color={
+                            //                                 getInvoice?.status >
+                            //                                 2
+                            //                                     ? "neutral"
+                            //                                     : "primary"
+                            //                             }
+                            //                         />
+                            //                     </IconButton>
+                            //                 </span>
+                            //             </LightTooltip>
+                            //             <LightTooltip
+                            //                 placement="bottom"
+                            //                 title="Xóa"
+                            //             >
+                            //                 <span>
+                            //                     <IconButton
+                            //                         disabled={
+                            //                             getInvoice?.status > 2
+                            //                         }
+                            //                         onClick={() => {
+                            //                             handleOpenDeleteConfirmPopup(
+                            //                                 rowData
+                            //                             );
+                            //                         }}
+                            //                     >
+                            //                         <DeleteRoundedIcon
+                            //                             color={
+                            //                                 getInvoice?.status >
+                            //                                 2
+                            //                                     ? "neutral"
+                            //                                     : "error"
+                            //                             }
+                            //                         />
+                            //                     </IconButton>
+                            //                 </span>
+                            //             </LightTooltip>
+                            //         </div>
+                            //     ),
+                            // },
                         ]}
                         data={cloneData || []}
                         exportFileName={"DanhSachNguoiDung"}

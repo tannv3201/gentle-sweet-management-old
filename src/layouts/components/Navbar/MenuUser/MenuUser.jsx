@@ -22,7 +22,7 @@ import { logout } from "../../../../redux/api/apiAuth";
 import { useDispatch } from "react-redux";
 import { createAxios } from "../../../../createInstance";
 import { logoutSuccess } from "../../../../redux/slice/authSlice";
-import { resetApp } from "../../../../redux/store";
+import { persistor, resetApp } from "../../../../redux/store";
 
 import { useMediaQuery } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
@@ -65,9 +65,11 @@ export default function MenuUser() {
             navigate,
             accessToken,
             axiosJWT
-        ).then(() => handleClose());
+        ).then(() => {
+            localStorage.clear();
+            handleClose();
+        });
     };
-
     const handleNavigateLogin = () => {
         navigate("/dang-nhap");
         handleClose();

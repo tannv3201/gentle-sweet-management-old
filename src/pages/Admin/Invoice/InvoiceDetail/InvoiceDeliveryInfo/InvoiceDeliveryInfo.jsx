@@ -121,7 +121,7 @@ function InvoiceDeliveryInfo({
             <div className={cx("delivery-info-header")}>
                 <h3>Thông tin đơn hàng</h3>
                 <div className={cx("btn-group")}>
-                    {currInvoice?.status > 1 && currInvoice?.status < 4 && (
+                    {currInvoice?.status === 3 && (
                         <GButton
                             color={"info"}
                             startIcon={<LocalShippingRounded />}
