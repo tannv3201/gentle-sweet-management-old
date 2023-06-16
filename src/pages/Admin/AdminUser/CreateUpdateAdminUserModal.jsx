@@ -11,13 +11,14 @@ import { createAxios } from "../../../createInstance";
 import GTextFieldNormal from "../../../components/GTextField/GTextFieldNormal";
 import { createAdminUser } from "../../../redux/api/apiAdminUser";
 import GDatePicker from "../../../components/GDatePicker/GDatePicker";
-import {
-    getDistrict,
-    getProvince,
-    getWard,
-} from "../../../redux/api/apiProvince";
+
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
+import {
+    districtApi,
+    provinceApi,
+    wardApi,
+} from "../../../redux/api/apiProvinceOpenAPI";
 
 const roleList = [
     {
@@ -131,7 +132,6 @@ export default function CreateUpdateAdminUserModal({
     const [provinces, setProvinces] = useState([]);
     const [districts, setDistricts] = useState([]);
     const [wards, setWards] = useState([]);
-
     // State Selected PROVINCE / DISTRICT /W ARD -> onChange
     const [selectedProvince, setSelectedProvince] = useState(null);
     const [selectedDistrict, setSelectedDistrict] = useState(null);
@@ -142,22 +142,18 @@ export default function CreateUpdateAdminUserModal({
 
     // Get province list from API
     useEffect(() => {
-        if (getProvinceList?.length === 0) {
-            getProvince(dispatch);
-        }
-
         setProvinces(getProvinceList);
     }, []);
 
     // Fn handle province onChange event
-    const handleProvinceChange = (event, value) => {
+    const handleProvinceChange = async (event, value) => {
         setSelectedProvince(value);
         setSelectedDistrict(null);
         setSelectedWard(null);
-        formik.setFieldValue("province", value?.province_id);
+        formik.setFieldValue("province", value?.code);
 
         if (value) {
-            getDistrict(value?.province_id).then((districts) => {
+            await districtApi(value?.code).then((districts) => {
                 setDistricts(districts);
             });
         } else {
@@ -169,13 +165,13 @@ export default function CreateUpdateAdminUserModal({
     };
 
     // Fn handle district onChange event
-    const handleDistrictChange = (event, value) => {
+    const handleDistrictChange = async (event, value) => {
         setSelectedDistrict(value);
         setSelectedWard(null);
-        formik.setFieldValue("district", value?.district_id);
+        formik.setFieldValue("district", value?.code);
 
         if (value) {
-            getWard(value?.district_id).then((wards) => {
+            await wardApi(value?.code).then((wards) => {
                 setWards(wards);
             });
         } else {
@@ -186,46 +182,15 @@ export default function CreateUpdateAdminUserModal({
     };
 
     // Fn handle ward onChange event
-    const handleChangeWard = (value) => {
+    const handleChangeWard = async (value) => {
         if (value) {
             setSelectedWard(value);
-            formik.setFieldValue("ward", value?.ward_id);
+            formik.setFieldValue("ward", value?.code);
         } else {
             formik.setFieldValue("ward", null);
         }
     };
 
-    // Set selected province/district/ward into states & Formik field
-    // useEffect(() => {
-    //     if (selectedUser) {
-    //         const provinceSelected = getProvinceById(
-    //             selectedUser?.province,
-    //             provinces
-    //         );
-    //         setSelectedProvince(provinceSelected);
-    //         formik.setFieldValue("province", provinceSelected?.province_id);
-
-    //         // District
-    //         getDistrict(selectedUser?.province).then((districtList) => {
-    //             const districtSelected = getDistrictById(
-    //                 selectedUser?.district,
-    //                 districtList
-    //             );
-    //             setSelectedDistrict(districtSelected);
-    //             setDistricts(districtList);
-    //             formik.setFieldValue("district", districtSelected?.district_id);
-    //         });
-
-    //         getWard(selectedUser?.district).then((wardList) => {
-    //             const wardSelected = getWardById(selectedUser?.ward, wardList);
-    //             setSelectedWard(wardSelected);
-    //             setWards(wardList);
-    //             formik.setFieldValue("ward", wardSelected?.ward_id);
-    //         });
-    //     }
-    // }, [selectedUser]);
-
-    // Fn handle birthdate onChange
     const handleChangeBirthDate = (value) => {
         if (value) {
             formik.setFieldValue("birth_date", value);
@@ -361,11 +326,9 @@ export default function CreateUpdateAdminUserModal({
                             <Autocomplete
                                 options={provinces}
                                 onBlur={formik.handleBlur}
-                                getOptionLabel={(option) =>
-                                    option.province_name
-                                }
+                                getOptionLabel={(option) => option.name}
                                 isOptionEqualToValue={(option, value) =>
-                                    value?.province_id === option?.province_id
+                                    value?.code === option?.code
                                 }
                                 onChange={handleProvinceChange}
                                 value={selectedProvince || null}
@@ -384,11 +347,9 @@ export default function CreateUpdateAdminUserModal({
                             <Autocomplete
                                 options={districts}
                                 onBlur={formik.handleBlur}
-                                getOptionLabel={(option) =>
-                                    option.district_name
-                                }
+                                getOptionLabel={(option) => option.name}
                                 isOptionEqualToValue={(option, value) =>
-                                    value?.district_id === option?.district_id
+                                    value?.code === option?.code
                                 }
                                 onChange={handleDistrictChange}
                                 value={selectedDistrict || null}
@@ -407,9 +368,9 @@ export default function CreateUpdateAdminUserModal({
                             <Autocomplete
                                 options={wards}
                                 onBlur={formik.handleBlur}
-                                getOptionLabel={(option) => option.ward_name}
+                                getOptionLabel={(option) => option.name}
                                 isOptionEqualToValue={(option, value) =>
-                                    value?.ward_id === option?.ward_id
+                                    value?.code === option?.code
                                 }
                                 onChange={(event, value) => {
                                     handleChangeWard(value);

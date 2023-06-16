@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import GButton from "../../../../../components/MyButton/MyButton";
-import { Autocomplete, Grid, InputAdornment } from "@mui/material";
+import { Autocomplete, Grid } from "@mui/material";
 import { useState } from "react";
 import * as Yup from "yup";
 import GModal from "../../../../../common/GModal/GModal";
@@ -9,18 +9,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../../../../../redux/slice/authSlice";
 import { createAxios } from "../../../../../createInstance";
 import GTextFieldNormal from "../../../../../components/GTextField/GTextFieldNormal";
-import GDatePicker from "../../../../../components/GDatePicker/GDatePicker";
-import {
-    getDistrict,
-    getProvince,
-    getWard,
-} from "../../../../../redux/api/apiProvince";
 
 import { useParams } from "react-router-dom";
 import {
     createDelivery,
     getDeliveryByInvoiceId,
 } from "../../../../../redux/api/apiDelivery";
+import {
+    districtApi,
+    wardApi,
+} from "../../../../../redux/api/apiProvinceOpenAPI";
 
 const paymentMethodList = [
     {
@@ -114,22 +112,18 @@ export default function UpdateCustomerInfoPopup({
 
     // Get province list from API
     useEffect(() => {
-        if (getProvinceList?.length === 0) {
-            getProvince(dispatch);
-        }
-
         setProvinces(getProvinceList);
     }, []);
 
     // Fn handle province onChange event
-    const handleProvinceChange = (event, value) => {
+    const handleProvinceChange = async (event, value) => {
         setSelectedProvince(value);
         setSelectedDistrict(null);
         setSelectedWard(null);
-        formik.setFieldValue("province", value?.province_id);
+        formik.setFieldValue("province", value?.code);
 
         if (value) {
-            getDistrict(value?.province_id).then((districts) => {
+            await districtApi(value?.code).then((districts) => {
                 setDistricts(districts);
             });
         } else {
@@ -141,13 +135,13 @@ export default function UpdateCustomerInfoPopup({
     };
 
     // Fn handle district onChange event
-    const handleDistrictChange = (event, value) => {
+    const handleDistrictChange = async (event, value) => {
         setSelectedDistrict(value);
         setSelectedWard(null);
-        formik.setFieldValue("district", value?.district_id);
+        formik.setFieldValue("district", value?.code);
 
         if (value) {
-            getWard(value?.district_id).then((wards) => {
+            await wardApi(value?.code).then((wards) => {
                 setWards(wards);
             });
         } else {
@@ -161,7 +155,7 @@ export default function UpdateCustomerInfoPopup({
     const handleChangeWard = (value) => {
         if (value) {
             setSelectedWard(value);
-            formik.setFieldValue("ward", value?.ward_id);
+            formik.setFieldValue("ward", value?.code);
         } else {
             formik.setFieldValue("ward", null);
         }
@@ -224,12 +218,9 @@ export default function UpdateCustomerInfoPopup({
                                 <Autocomplete
                                     options={provinces}
                                     onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) =>
-                                        option.province_name
-                                    }
+                                    getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) =>
-                                        value?.province_id ===
-                                        option?.province_id
+                                        value?.code === option?.code
                                     }
                                     onChange={handleProvinceChange}
                                     value={selectedProvince || null}
@@ -248,12 +239,9 @@ export default function UpdateCustomerInfoPopup({
                                 <Autocomplete
                                     options={districts}
                                     onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) =>
-                                        option.district_name
-                                    }
+                                    getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) =>
-                                        value?.district_id ===
-                                        option?.district_id
+                                        value?.code === option?.code
                                     }
                                     onChange={handleDistrictChange}
                                     value={selectedDistrict || null}
@@ -272,11 +260,9 @@ export default function UpdateCustomerInfoPopup({
                                 <Autocomplete
                                     options={wards}
                                     onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) =>
-                                        option.ward_name
-                                    }
+                                    getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) =>
-                                        value?.ward_id === option?.ward_id
+                                        value?.code === option?.code
                                     }
                                     onChange={(event, value) => {
                                         handleChangeWard(value);

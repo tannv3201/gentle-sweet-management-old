@@ -12,14 +12,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_IMAGE_URL } from "../../../../LocalConstants";
 
-import {
-    getDistrict,
-    getDistrictById,
-    getProvince,
-    getProvinceById,
-    getWard,
-    getWardById,
-} from "../../../../redux/api/apiProvince";
 import GButton from "../../../../components/MyButton/MyButton";
 import { ArrowBackIosNew, ModeEditOutlineRounded } from "@mui/icons-material";
 import GTextFieldNormal from "../../../../components/GTextField/GTextFieldNormal";
@@ -33,6 +25,13 @@ import {
     getCustomerUserById,
     updateCustomerUserByAdmin,
 } from "../../../../redux/api/apiCustomerUser";
+import {
+    districtApi,
+    getDistrictById,
+    getProvinceById,
+    getWardById,
+    wardApi,
+} from "../../../../redux/api/apiProvinceOpenAPI";
 
 const cx = classNames.bind(styles);
 export default function CustomerUserDetail() {
@@ -146,22 +145,18 @@ export default function CustomerUserDetail() {
 
     // Get province list from API
     useEffect(() => {
-        if (getProvinceList?.length === 0) {
-            getProvince(dispatch);
-        }
-
         setProvinces(getProvinceList);
     }, []);
 
     // Fn handle province onChange event
-    const handleProvinceChange = (event, value) => {
+    const handleProvinceChange = async (event, value) => {
         setSelectedProvince(value);
         setSelectedDistrict(null);
         setSelectedWard(null);
-        formik.setFieldValue("province", value?.province_id);
+        formik.setFieldValue("province", value?.code);
 
         if (value) {
-            getDistrict(value?.province_id).then((districts) => {
+            await districtApi(value?.code).then((districts) => {
                 setDistricts(districts);
             });
         } else {
@@ -173,13 +168,13 @@ export default function CustomerUserDetail() {
     };
 
     // Fn handle district onChange event
-    const handleDistrictChange = (event, value) => {
+    const handleDistrictChange = async (event, value) => {
         setSelectedDistrict(value);
         setSelectedWard(null);
-        formik.setFieldValue("district", value?.district_id);
+        formik.setFieldValue("district", value?.code);
 
         if (value) {
-            getWard(value?.district_id).then((wards) => {
+            await wardApi(value?.code).then((wards) => {
                 setWards(wards);
             });
         } else {
@@ -193,7 +188,7 @@ export default function CustomerUserDetail() {
     const handleChangeWard = (value) => {
         if (value) {
             setSelectedWard(value);
-            formik.setFieldValue("ward", value?.ward_id);
+            formik.setFieldValue("ward", value?.code);
         } else {
             formik.setFieldValue("ward", null);
         }
@@ -201,32 +196,45 @@ export default function CustomerUserDetail() {
 
     // Set selected province/district/ward into states & Formik field
     useEffect(() => {
-        if (cloneData) {
-            const provinceSelected = getProvinceById(
-                cloneData?.province,
-                provinces
-            );
-            setSelectedProvince(provinceSelected);
-            formik.setFieldValue("province", provinceSelected?.province_id);
-
-            // District
-            getDistrict(cloneData?.province).then((districtList) => {
-                const districtSelected = getDistrictById(
-                    cloneData?.district,
-                    districtList
+        const fetch = async () => {
+            if (cloneData) {
+                const provinceSelected = getProvinceById(
+                    cloneData?.province,
+                    provinces
                 );
-                setSelectedDistrict(districtSelected);
-                setDistricts(districtList);
-                formik.setFieldValue("district", districtSelected?.district_id);
-            });
+                setSelectedProvince(provinceSelected);
+                formik.setFieldValue("province", provinceSelected?.code);
 
-            getWard(cloneData?.district).then((wardList) => {
-                const wardSelected = getWardById(cloneData?.ward, wardList);
-                setSelectedWard(wardSelected);
-                setWards(wardList);
-                formik.setFieldValue("ward", wardSelected?.ward_id);
-            });
-        }
+                // District
+                await districtApi(parseInt(getCustomerUser?.province)).then(
+                    (districtList) => {
+                        const districtSelected = getDistrictById(
+                            cloneData?.district,
+                            districtList
+                        );
+                        setSelectedDistrict(districtSelected);
+                        setDistricts(districtList);
+                        formik.setFieldValue(
+                            "district",
+                            districtSelected?.code
+                        );
+                    }
+                );
+
+                await wardApi(parseInt(getCustomerUser?.district)).then(
+                    (wardList) => {
+                        const wardSelected = getWardById(
+                            cloneData?.ward,
+                            wardList
+                        );
+                        setSelectedWard(wardSelected);
+                        setWards(wardList);
+                        formik.setFieldValue("ward", wardSelected?.code);
+                    }
+                );
+            }
+        };
+        fetch();
     }, [cloneData]);
 
     // Fn handle birthdate onChange
@@ -237,16 +245,6 @@ export default function CustomerUserDetail() {
             formik.setFieldValue("birth_date", null);
         }
         formik.validateField("birth_date");
-    };
-
-    const handleChangeRole = (data) => {
-        if (data) {
-            formik.setFieldValue("role_id", data?.role_id);
-            formik.setFieldValue("role_name", data?.role_name);
-        } else {
-            formik.setFieldValue("role_id", null);
-            formik.setFieldValue("role_name", null);
-        }
     };
 
     useEffect(() => {
@@ -346,6 +344,7 @@ export default function CustomerUserDetail() {
                                             </InputAdornment>
                                         ),
                                     }}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             <Grid item xs={6}>
@@ -357,6 +356,7 @@ export default function CustomerUserDetail() {
                                     name="last_name"
                                     value={formik.values?.last_name || ""}
                                     formik={formik}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             <Grid item xs={6}>
@@ -368,6 +368,7 @@ export default function CustomerUserDetail() {
                                     name="first_name"
                                     value={formik.values?.first_name || ""}
                                     formik={formik}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
 
@@ -391,6 +392,7 @@ export default function CustomerUserDetail() {
                                         formik?.touched?.birth_date &&
                                         formik?.errors?.birth_date
                                     }
+                                    inputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             <Grid item xs={6}>
@@ -402,6 +404,7 @@ export default function CustomerUserDetail() {
                                     name="phone_number"
                                     value={formik.values?.phone_number || ""}
                                     formik={formik}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             <Grid item xs={4}>
@@ -409,12 +412,9 @@ export default function CustomerUserDetail() {
                                     disabled={!isEditting}
                                     options={provinces}
                                     onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) =>
-                                        option.province_name
-                                    }
+                                    getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) =>
-                                        value?.province_id ===
-                                        option?.province_id
+                                        value?.code === option?.code
                                     }
                                     onChange={handleProvinceChange}
                                     value={selectedProvince || null}
@@ -426,6 +426,7 @@ export default function CustomerUserDetail() {
                                             variant="outlined"
                                             name="province"
                                             formik={formik}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     )}
                                 />
@@ -435,12 +436,9 @@ export default function CustomerUserDetail() {
                                     disabled={!isEditting}
                                     options={districts}
                                     onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) =>
-                                        option.district_name
-                                    }
+                                    getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) =>
-                                        value?.district_id ===
-                                        option?.district_id
+                                        value?.code === option?.code
                                     }
                                     onChange={handleDistrictChange}
                                     value={selectedDistrict || null}
@@ -452,6 +450,7 @@ export default function CustomerUserDetail() {
                                             variant="outlined"
                                             name="district"
                                             formik={formik}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     )}
                                 />
@@ -461,11 +460,9 @@ export default function CustomerUserDetail() {
                                     disabled={!isEditting}
                                     options={wards}
                                     onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) =>
-                                        option.ward_name
-                                    }
+                                    getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) =>
-                                        value?.ward_id === option?.ward_id
+                                        value?.code === option?.code
                                     }
                                     onChange={(event, value) => {
                                         handleChangeWard(value);
@@ -479,6 +476,7 @@ export default function CustomerUserDetail() {
                                             variant="outlined"
                                             name="ward"
                                             formik={formik}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     )}
                                 />
@@ -492,6 +490,7 @@ export default function CustomerUserDetail() {
                                     name="detail_address"
                                     value={formik.values?.detail_address || ""}
                                     formik={formik}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             {isEditting && (

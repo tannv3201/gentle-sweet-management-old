@@ -9,16 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../../../../../redux/slice/authSlice";
 import { createAxios } from "../../../../../createInstance";
 import GTextFieldNormal from "../../../../../components/GTextField/GTextFieldNormal";
-import GDatePicker from "../../../../../components/GDatePicker/GDatePicker";
-import {
-    getDistrict,
-    getProvince,
-    getWard,
-} from "../../../../../redux/api/apiProvince";
-import { createCustomerUser } from "../../../../../redux/api/apiCustomerUser";
-import { toast } from "react-hot-toast";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+
 import { useParams } from "react-router-dom";
 import { updateDelivery } from "../../../../../redux/api/apiDelivery";
 

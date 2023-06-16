@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { createAxios } from "../../../../createInstance";
 import { loginSuccess } from "../../../../redux/slice/authSlice";
 import {
-    createAdminUser,
     getAdminUserById,
     updateAdminUser,
 } from "../../../../redux/api/apiAdminUser";
@@ -16,14 +15,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_IMAGE_URL } from "../../../../LocalConstants";
 
-import {
-    getDistrict,
-    getDistrictById,
-    getProvince,
-    getProvinceById,
-    getWard,
-    getWardById,
-} from "../../../../redux/api/apiProvince";
 import GButton from "../../../../components/MyButton/MyButton";
 import { ArrowBackIosNew, ModeEditOutlineRounded } from "@mui/icons-material";
 import GTextFieldNormal from "../../../../components/GTextField/GTextFieldNormal";
@@ -33,6 +24,13 @@ import GDatePicker from "../../../../components/GDatePicker/GDatePicker";
 import { useParams } from "react-router-dom";
 import utc from "dayjs/plugin/utc";
 import PasswordMenu from "./PasswordMenu/PasswordMenu";
+import {
+    districtApi,
+    getDistrictById,
+    getProvinceById,
+    getWardById,
+    wardApi,
+} from "../../../../redux/api/apiProvinceOpenAPI";
 
 const cx = classNames.bind(styles);
 export default function AdminUserDetail() {
@@ -87,14 +85,6 @@ export default function AdminUserDetail() {
 
     let axiosJWT = createAxios(user, dispatch, loginSuccess);
 
-    const handleCreateAdminUser = (adminUser) => {
-        createAdminUser(user?.accessToken, dispatch, adminUser, axiosJWT).then(
-            () => {
-                handleCloseModal();
-            }
-        );
-    };
-
     const handleUpdateAdminUser = (adminUser) => {
         updateAdminUser(
             user?.accessToken,
@@ -131,17 +121,6 @@ export default function AdminUserDetail() {
                 "Ngày sinh không được nhỏ hơn 01/01/1900"
             ),
     });
-
-    const handleCloseModal = () => {
-        formik.resetForm();
-        formik.setFieldValue("province", null);
-        formik.setFieldValue("district", null);
-        formik.setFieldValue("ward", null);
-        setSelectedProvince(null);
-        setSelectedDistrict(null);
-        setSelectedWard(null);
-        // props.handleClose();
-    };
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -180,14 +159,14 @@ export default function AdminUserDetail() {
     }, []);
 
     // Fn handle province onChange event
-    const handleProvinceChange = (event, value) => {
+    const handleProvinceChange = async (event, value) => {
         setSelectedProvince(value);
         setSelectedDistrict(null);
         setSelectedWard(null);
-        formik.setFieldValue("province", value?.province_id);
+        formik.setFieldValue("province", value?.code);
 
         if (value) {
-            getDistrict(value?.province_id).then((districts) => {
+            await districtApi(value?.code).then((districts) => {
                 setDistricts(districts);
             });
         } else {
@@ -199,13 +178,13 @@ export default function AdminUserDetail() {
     };
 
     // Fn handle district onChange event
-    const handleDistrictChange = (event, value) => {
+    const handleDistrictChange = async (event, value) => {
         setSelectedDistrict(value);
         setSelectedWard(null);
-        formik.setFieldValue("district", value?.district_id);
+        formik.setFieldValue("district", value?.code);
 
         if (value) {
-            getWard(value?.district_id).then((wards) => {
+            await wardApi(value?.code).then((wards) => {
                 setWards(wards);
             });
         } else {
@@ -219,7 +198,7 @@ export default function AdminUserDetail() {
     const handleChangeWard = (value) => {
         if (value) {
             setSelectedWard(value);
-            formik.setFieldValue("ward", value?.ward_id);
+            formik.setFieldValue("ward", value?.code);
         } else {
             formik.setFieldValue("ward", null);
         }
@@ -227,32 +206,45 @@ export default function AdminUserDetail() {
 
     // Set selected province/district/ward into states & Formik field
     useEffect(() => {
-        if (cloneData) {
-            const provinceSelected = getProvinceById(
-                cloneData?.province,
-                provinces
-            );
-            setSelectedProvince(provinceSelected);
-            formik.setFieldValue("province", provinceSelected?.province_id);
-
-            // District
-            getDistrict(cloneData?.province).then((districtList) => {
-                const districtSelected = getDistrictById(
-                    cloneData?.district,
-                    districtList
+        const fetch = async () => {
+            if (cloneData) {
+                const provinceSelected = getProvinceById(
+                    cloneData?.province,
+                    provinces
                 );
-                setSelectedDistrict(districtSelected);
-                setDistricts(districtList);
-                formik.setFieldValue("district", districtSelected?.district_id);
-            });
+                setSelectedProvince(provinceSelected);
+                formik.setFieldValue("province", provinceSelected?.code);
+                // District
+                await districtApi(parseInt(getAdminUser?.province)).then(
+                    (districtList) => {
+                        const districtSelected = getDistrictById(
+                            cloneData?.district,
+                            districtList
+                        );
+                        setSelectedDistrict(districtSelected);
+                        setDistricts(districtList);
+                        formik.setFieldValue(
+                            "district",
+                            districtSelected?.code
+                        );
+                    }
+                );
 
-            getWard(cloneData?.district).then((wardList) => {
-                const wardSelected = getWardById(cloneData?.ward, wardList);
-                setSelectedWard(wardSelected);
-                setWards(wardList);
-                formik.setFieldValue("ward", wardSelected?.ward_id);
-            });
-        }
+                await wardApi(parseInt(getAdminUser?.district)).then(
+                    (wardList) => {
+                        const wardSelected = getWardById(
+                            cloneData?.ward,
+                            wardList
+                        );
+                        setSelectedWard(wardSelected);
+                        setWards(wardList);
+                        formik.setFieldValue("ward", wardSelected?.code);
+                    }
+                );
+            }
+        };
+
+        fetch();
     }, [cloneData]);
 
     // Fn handle birthdate onChange
@@ -312,7 +304,7 @@ export default function AdminUserDetail() {
                 axiosJWT
             );
         }
-    }, []);
+    }, [adminUserId]);
 
     const handleBack = () => {
         navigate("/admin-user");
@@ -393,6 +385,7 @@ export default function AdminUserDetail() {
                                             fullWidth
                                             label="Quyền hạn"
                                             formik={formik}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     )}
                                 />
@@ -417,6 +410,7 @@ export default function AdminUserDetail() {
                                         formik?.touched?.birth_date &&
                                         formik?.errors?.birth_date
                                     }
+                                    inputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             <Grid item xs={6}>
@@ -428,6 +422,7 @@ export default function AdminUserDetail() {
                                     name="last_name"
                                     value={formik.values?.last_name || ""}
                                     formik={formik}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             <Grid item xs={6}>
@@ -439,6 +434,7 @@ export default function AdminUserDetail() {
                                     name="first_name"
                                     value={formik.values?.first_name || ""}
                                     formik={formik}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             <Grid item xs={6}>
@@ -457,6 +453,7 @@ export default function AdminUserDetail() {
                                             </InputAdornment>
                                         ),
                                     }}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             <Grid item xs={6}>
@@ -468,6 +465,7 @@ export default function AdminUserDetail() {
                                     name="phone_number"
                                     value={formik.values?.phone_number || ""}
                                     formik={formik}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             <Grid item xs={4}>
@@ -475,12 +473,9 @@ export default function AdminUserDetail() {
                                     disabled={!isEditting}
                                     options={provinces}
                                     onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) =>
-                                        option.province_name
-                                    }
+                                    getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) =>
-                                        value?.province_id ===
-                                        option?.province_id
+                                        value?.code === option?.code
                                     }
                                     onChange={handleProvinceChange}
                                     value={selectedProvince || null}
@@ -492,6 +487,7 @@ export default function AdminUserDetail() {
                                             variant="outlined"
                                             name="province"
                                             formik={formik}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     )}
                                 />
@@ -501,12 +497,9 @@ export default function AdminUserDetail() {
                                     disabled={!isEditting}
                                     options={districts}
                                     onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) =>
-                                        option.district_name
-                                    }
+                                    getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) =>
-                                        value?.district_id ===
-                                        option?.district_id
+                                        value?.code === option?.code
                                     }
                                     onChange={handleDistrictChange}
                                     value={selectedDistrict || null}
@@ -518,6 +511,7 @@ export default function AdminUserDetail() {
                                             variant="outlined"
                                             name="district"
                                             formik={formik}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     )}
                                 />
@@ -527,11 +521,9 @@ export default function AdminUserDetail() {
                                     disabled={!isEditting}
                                     options={wards}
                                     onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) =>
-                                        option.ward_name
-                                    }
+                                    getOptionLabel={(option) => option.name}
                                     isOptionEqualToValue={(option, value) =>
-                                        value?.ward_id === option?.ward_id
+                                        value?.code === option?.code
                                     }
                                     onChange={(event, value) => {
                                         handleChangeWard(value);
@@ -545,6 +537,7 @@ export default function AdminUserDetail() {
                                             variant="outlined"
                                             name="ward"
                                             formik={formik}
+                                            InputLabelProps={{ shrink: true }}
                                         />
                                     )}
                                 />
@@ -558,6 +551,7 @@ export default function AdminUserDetail() {
                                     name="detail_address"
                                     value={formik.values?.detail_address || ""}
                                     formik={formik}
+                                    InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
                             {isEditting && (
