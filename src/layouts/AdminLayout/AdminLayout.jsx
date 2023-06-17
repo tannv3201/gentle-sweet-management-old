@@ -127,26 +127,16 @@ export default function AdminLayout({ children }) {
                     <Divider />
                     <List component="nav">
                         <MainListItems />
-                        {/* <Divider sx={{ my: 1 }} /> */}
-                        {/* <SecondaryListItems /> */}
                     </List>
                 </Drawer>
                 <Box
                     component="main"
                     sx={{
-                        // backgroundColor: (theme) =>
-                        //     theme.palette.mode === "light"
-                        //         ? theme.palette.grey[100]
-                        //         : theme.palette.grey[900],
                         flexGrow: 1,
-                        // height: "100%",
-                        // overflow: "auto",
                     }}
                 >
                     <Toolbar />
-                    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                        {children}
-                    </Container>
+                    <div className={cx("wrapper-children")}>{children}</div>
                 </Box>
             </Box>
         </ThemeProvider>
