@@ -9,6 +9,7 @@ export default function GTable({
     actions,
     pagesize,
     paging,
+    noRecordMessage = "",
     ...props
 }) {
     const defaultMaterialTheme = createTheme();
@@ -35,6 +36,11 @@ export default function GTable({
                             addRemoveColumns: "Ẩn/hiện cột",
                             searchTooltip: "Tìm kiếm",
                             searchPlaceholder: "Nhập từ khóa...",
+                        },
+                        body: {
+                            emptyDataSourceMessage: noRecordMessage
+                                ? noRecordMessage
+                                : "Không có bản ghi nào để hiển thị",
                         },
                     }}
                     options={{
