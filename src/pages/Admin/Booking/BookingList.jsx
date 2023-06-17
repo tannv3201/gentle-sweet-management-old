@@ -9,7 +9,6 @@ import { createAxios } from "../../../createInstance";
 import { useState } from "react";
 import GTable from "../../../common/GTable/GTable";
 import { IconButton } from "@mui/material";
-import GButton from "../../../components/MyButton/MyButton";
 
 import { LightTooltip } from "../../../components/GTooltip/GTooltip";
 import { FormatCurrency } from "../../../components/FormatCurrency/FormatCurrency";
@@ -198,6 +197,13 @@ export default function BookingList() {
             <GTable
                 title={"DANH SÁCH LỊCH HẸN"}
                 columns={[
+                    {
+                        title: "Mã lịch hẹn",
+                        field: "id",
+                        render: (rowData) => {
+                            return <>{`#${rowData?.id}`}</>;
+                        },
+                    },
                     {
                         title: "Khách hàng",
                         field: "fullName",

@@ -9,7 +9,6 @@ import { createAxios } from "../../../createInstance";
 import { useState } from "react";
 import GTable from "../../../common/GTable/GTable";
 import { IconButton } from "@mui/material";
-import GButton from "../../../components/MyButton/MyButton";
 
 import { LightTooltip } from "../../../components/GTooltip/GTooltip";
 import { FormatCurrency } from "../../../components/FormatCurrency/FormatCurrency";
@@ -197,6 +196,13 @@ export default function InvoiceList() {
             <GTable
                 title={"DANH SÁCH ĐƠN HÀNG"}
                 columns={[
+                    {
+                        title: "Mã đơn hàng",
+                        field: "id",
+                        render: (rowData) => {
+                            return <>{`#${rowData?.id}`}</>;
+                        },
+                    },
                     {
                         title: "Khách hàng",
                         field: "fullName",
