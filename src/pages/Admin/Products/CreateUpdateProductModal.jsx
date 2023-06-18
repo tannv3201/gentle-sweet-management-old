@@ -4,7 +4,7 @@ import GButton from "../../../components/MyButton/MyButton";
 import { Autocomplete, Grid } from "@mui/material";
 import { useState } from "react";
 import * as Yup from "yup";
-import GModal from "../../../common/GModal/GModal";
+import GModal from "../../../components/GModal/GModal";
 import { getAllProductCategory } from "../../../redux/api/apiProductCategory";
 import { useDispatch, useSelector } from "react-redux";
 import { loginSuccess } from "../../../redux/slice/authSlice";

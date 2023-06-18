@@ -7,11 +7,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { loginSuccess } from "../../../redux/slice/authSlice";
 import { createAxios } from "../../../createInstance";
 import { useState } from "react";
-import GTable from "../../../common/GTable/GTable";
+import GTable from "../../../components/GTable/GTable";
 import { IconButton } from "@mui/material";
 
 import { LightTooltip } from "../../../components/GTooltip/GTooltip";
-import { FormatCurrency } from "../../../components/FormatCurrency/FormatCurrency";
 
 import styles from "./Invoice.module.scss";
 import classNames from "classnames/bind";
@@ -24,6 +23,7 @@ import utc from "dayjs/plugin/utc";
 import { getAllCustomerUser } from "../../../redux/api/apiCustomerUser";
 import { getAllProduct } from "../../../redux/api/apiProduct";
 import FilterInvoice from "./FilterInvoice/FilterInvoice";
+import { FormatCurrency } from "../../../utils/FormatCurrency/formatCurrency";
 
 const cx = classNames.bind(styles);
 

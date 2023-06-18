@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import GModal from "../../../../../common/GModal/GModal";
+import GModal from "../../../../../components/GModal/GModal";
 import GButton from "../../../../../components/MyButton/MyButton";
 import { createAxios } from "../../../../../createInstance";
 import { loginSuccess } from "../../../../../redux/slice/authSlice";

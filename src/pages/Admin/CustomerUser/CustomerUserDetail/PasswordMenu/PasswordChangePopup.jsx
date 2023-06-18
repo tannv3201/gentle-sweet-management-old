@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 
 import { Grid } from "@mui/material";
 import * as Yup from "yup";
-import GModal from "../../../../../common/GModal/GModal";
+import GModal from "../../../../../components/GModal/GModal";
 import GButton from "../../../../../components/MyButton/MyButton";
 import GTextFieldNormal from "../../../../../components/GTextField/GTextFieldNormal";
 import { toast } from "react-hot-toast";

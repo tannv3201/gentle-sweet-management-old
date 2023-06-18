@@ -3,7 +3,7 @@ import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import GTable from "../../../../common/GTable/GTable";
+import GTable from "../../../../components/GTable/GTable";
 import { IconButton } from "@mui/material";
 import GButton from "../../../../components/MyButton/MyButton";
 import { LightTooltip } from "../../../../components/GTooltip/GTooltip";
@@ -12,11 +12,11 @@ import classNames from "classnames/bind";
 import { EditRounded, ReportProblemRounded } from "@mui/icons-material";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { FormatCurrency } from "../../../../components/FormatCurrency/FormatCurrency";
 import UpdateServiceInvoiceDetailPopup from "./UpdateServiceBookingDetail";
 import ConfirmDeleteService from "./ConfirmDeleteService";
 import AddServiceToBookingDetail from "./AddServiceToBookingDetail";
 import { GFormatDate } from "../../../../components/GDatePicker/GDatePicker";
+import { FormatCurrency } from "../../../../utils/FormatCurrency/formatCurrency";
 
 const cx = classNames.bind(styles);
 

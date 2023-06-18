@@ -7,12 +7,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { loginSuccess } from "../../../redux/slice/authSlice";
 import { createAxios } from "../../../createInstance";
 import { useState } from "react";
-import GTable from "../../../common/GTable/GTable";
+import GTable from "../../../components/GTable/GTable";
 import { IconButton } from "@mui/material";
 import GButton from "../../../components/MyButton/MyButton";
 
 import { LightTooltip } from "../../../components/GTooltip/GTooltip";
-import { FormatCurrency } from "../../../components/FormatCurrency/FormatCurrency";
 import { getAllService } from "../../../redux/api/apiService";
 import DeleteServicePopup from "./DeleteServicePopup";
 import CreateUpdateServiceModal from "./CreateUpdateServiceModal";
@@ -22,6 +21,7 @@ import styles from "./Service.module.scss";
 import classNames from "classnames/bind";
 import { InfoRounded } from "@mui/icons-material";
 import FilterService from "./FilterService/FilterService";
+import { FormatCurrency } from "../../../utils/FormatCurrency/formatCurrency";
 const cx = classNames.bind(styles);
 
 export default function ServiceList() {

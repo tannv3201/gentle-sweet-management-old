@@ -21,7 +21,7 @@ import {
     createInvoiceDetail,
     updateInvoiceDetail,
 } from "../../../../redux/api/apiInvoiceDetail";
-import GModal from "../../../../common/GModal/GModal";
+import GModal from "../../../../components/GModal/GModal";
 import { getAllProduct } from "../../../../redux/api/apiProduct";
 import GDatePicker, {
     GFormatDate,

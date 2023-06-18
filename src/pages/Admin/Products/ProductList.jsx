@@ -9,13 +9,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { loginSuccess } from "../../../redux/slice/authSlice";
 import { createAxios } from "../../../createInstance";
 import { useState } from "react";
-import GTable from "../../../common/GTable/GTable";
+import GTable from "../../../components/GTable/GTable";
 import { IconButton } from "@mui/material";
 import GButton from "../../../components/MyButton/MyButton";
 
 import { LightTooltip } from "../../../components/GTooltip/GTooltip";
 import CreateUpdateProductModal from "./CreateUpdateProductModal";
-import { FormatCurrency } from "../../../components/FormatCurrency/FormatCurrency";
 
 import DeleteProductPopup from "./DeleteProductPopup";
 import { API_IMAGE_URL } from "../../../LocalConstants";
@@ -23,6 +22,7 @@ import styles from "./Product.module.scss";
 import classNames from "classnames/bind";
 import { InfoRounded } from "@mui/icons-material";
 import FilterProduct from "./FilterProduct/FilterProduct";
+import { FormatCurrency } from "../../../utils/FormatCurrency/formatCurrency";
 
 const cx = classNames.bind(styles);
 

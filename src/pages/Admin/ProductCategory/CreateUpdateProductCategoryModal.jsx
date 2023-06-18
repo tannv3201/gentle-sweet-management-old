@@ -4,7 +4,7 @@ import GButton from "../../../components/MyButton/MyButton";
 import { Grid } from "@mui/material";
 import { useState } from "react";
 import * as Yup from "yup";
-import GModal from "../../../common/GModal/GModal";
+import GModal from "../../../components/GModal/GModal";
 import {
     createProductCategory,
     updateProductCategory,

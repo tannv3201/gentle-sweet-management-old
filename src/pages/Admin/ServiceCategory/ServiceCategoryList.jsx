@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { loginSuccess } from "../../../redux/slice/authSlice";
 import { createAxios } from "../../../createInstance";
 import { useState } from "react";
-import GTable from "../../../common/GTable/GTable";
+import GTable from "../../../components/GTable/GTable";
 import { IconButton } from "@mui/material";
 import GButton from "../../../components/MyButton/MyButton";
 
