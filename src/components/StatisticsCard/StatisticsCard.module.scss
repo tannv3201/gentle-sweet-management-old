@@ -1,0 +1,37 @@
+.statistics-card-wrapper {
+    background-color: var(--white);
+    box-shadow: 0 0 0.875rem 0 rgba(53, 64, 82, 0.05);
+
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 4px 12px;
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: var(--fw-medium);
+            text-transform: uppercase;
+        }
+    }
+
+    .body {
+        padding: 4px 12px 12px;
+
+        .children-item {
+            padding: 4px;
+            border: 1px solid var(--border-color);
+            .children-item-header {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                .item-title {
+                    margin-left: 4px;
+                }
+            }
+            .children-item-body {
+                text-align: center;
+                font-size: 2.4rem;
+                font-weight: var(--fw-medium);
+            }
+        }
+    }
+}
