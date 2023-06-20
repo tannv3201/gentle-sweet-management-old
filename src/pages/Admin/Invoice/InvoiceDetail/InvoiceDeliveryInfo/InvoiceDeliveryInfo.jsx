@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import styles from "./InvoiceDeliveryInfo.module.scss";
 import classNames from "classnames/bind";
-import { Grid } from "@mui/material";
+import { Grid, IconButton } from "@mui/material";
 import { useSelector } from "react-redux";
 import { GFormatDate } from "../../../../../components/GDatePicker/GDatePicker";
 import {
+    CheckCircleRounded,
+    HourglassTopRounded,
     LocalShippingRounded,
     PriorityHighRounded,
     VisibilityRounded,
+    WarningRounded,
 } from "@mui/icons-material";
 import InvoiceStatusMenu from "../InvoiceStatusMenu/InvoiceStatusMenu";
 import DeliveryCodePopup from "../DeliveryCode/DeliveryCode";
@@ -18,6 +21,7 @@ import { useDispatch } from "react-redux";
 import { createAxios } from "../../../../../createInstance";
 import { loginSuccess } from "../../../../../redux/slice/authSlice";
 import { useParams } from "react-router-dom";
+import { LightTooltip } from "../../../../../components/GTooltip/GTooltip";
 
 const cx = classNames.bind(styles);
 
@@ -68,7 +72,7 @@ function InvoiceDeliveryInfo({
     useEffect(() => {
         if (getAdminUser) setAdminUser(structuredClone(getAdminUser));
     }, [getAdminUser]);
-
+    console.log(currInvoice);
     useEffect(() => {
         if (deliveryByInvoiceId) {
             setDeliveryClone({
@@ -135,7 +139,7 @@ function InvoiceDeliveryInfo({
                     )}
                     {currInvoice?.status === 7 && (
                         <div className={cx("cancel-request")}>
-                            <PriorityHighRounded color="error" /> Yêu cầu hủy
+                            <WarningRounded htmlColor="#f57c00" /> Yêu cầu hủy
                             đơn hàng:
                             <div className={cx("cancel-request-action")}>
                                 <GButton
@@ -260,9 +264,49 @@ function InvoiceDeliveryInfo({
                         />
                     </Grid>
                     <Grid item xs={6}>
+                        <div className={cx("payment-method-wrapper")}>
+                            <InfoItem
+                                label={"Phương thức thanh toán"}
+                                content={currInvoice?.paymentMethodName}
+                            />
+                            {currInvoice?.payment_method > 1 && (
+                                <div>
+                                    <LightTooltip
+                                        title={
+                                            currInvoice?.paid === 1
+                                                ? "Chờ thanh toán"
+                                                : currInvoice?.paid === 2
+                                                ? "Đã thanh toán"
+                                                : ""
+                                        }
+                                        placement="right"
+                                    >
+                                        {currInvoice?.paid === 1 ? (
+                                            <IconButton>
+                                                <HourglassTopRounded htmlColor="#f57c00" />
+                                            </IconButton>
+                                        ) : (
+                                            <IconButton>
+                                                <CheckCircleRounded htmlColor="#2e7d32" />
+                                            </IconButton>
+                                        )}
+                                    </LightTooltip>
+                                </div>
+                            )}
+                        </div>
+                    </Grid>
+                    <Grid item xs={6}>
                         <InfoItem
-                            label={"Phương thức thanh toán"}
-                            content={deliveryClone?.paymentMethodName}
+                            label={"Nội dung chuyển khoản"}
+                            content={currInvoice?.bank_transfer_content}
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <InfoItem
+                            label={"Ghi chú"}
+                            content={
+                                currInvoice?.note ? currInvoice?.note : "--"
+                            }
                         />
                     </Grid>
                 </Grid>

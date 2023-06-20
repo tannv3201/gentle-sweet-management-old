@@ -78,7 +78,7 @@ export default function DeliveryCodePopup({ handleOpen, isOpen, ...props }) {
                 handleClose={handleCloseModal}
                 handleOpen={handleOpen}
                 isOpen={isOpen}
-                title={"Cập nhật mã vận đơn"}
+                title={"Đơn vị vận chuyển"}
             >
                 <div style={{ width: 500 }}>
                     <form onSubmit={formik.handleSubmit}>

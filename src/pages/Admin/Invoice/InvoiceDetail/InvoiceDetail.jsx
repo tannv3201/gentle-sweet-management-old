@@ -26,6 +26,7 @@ import CancelPopup from "./ConfirmInvoice/CancelPopup";
 import { getDeliveryByInvoiceId } from "../../../../redux/api/apiDelivery";
 import InvoiceCustomerInfo from "./InvoiceCustomerInfo/InvoiceCustomerInfo";
 import InvoiceDeliveryInfo from "./InvoiceDeliveryInfo/InvoiceDeliveryInfo";
+import ConfirmPaid from "./ConfirmInvoice/ConfirmPaid";
 
 const cx = classNames.bind(styles);
 
@@ -51,7 +52,6 @@ export default function InvoiceDetail() {
     const getInvoiceDetail = useSelector(
         (state) => state.invoiceDetail.invoiceDetail?.invoiceDetailByInvoice
     );
-
     useEffect(() => {
         setCurrInvoice(
             structuredClone({
@@ -71,6 +71,14 @@ export default function InvoiceDetail() {
                         ? "Đã hủy"
                         : getInvoice?.status === 7
                         ? "Yêu cầu hủy đơn"
+                        : "",
+                paymentMethodName:
+                    getInvoice?.payment_method === 1
+                        ? "Thanh toán khi nhận hàng"
+                        : getInvoice?.payment_method === 2
+                        ? "Chuyển khoản ngân hàng"
+                        : getInvoice?.payment_method === 3
+                        ? "Ví điện tử"
                         : "",
             })
         );
@@ -124,6 +132,17 @@ export default function InvoiceDetail() {
         setIsOpenConfirmInvoice(false);
     };
 
+    // Confirm paid
+    const [isOpenConfirmPaid, setIsOpenConfirmPaid] = useState(false);
+
+    const handleOpenConfirmPaid = () => {
+        setIsOpenConfirmPaid(true);
+    };
+
+    const handleCloseConfirmPaid = () => {
+        setIsOpenConfirmPaid(false);
+    };
+
     // Cancel invoice
     const [isOpenCancelInvoice, setIsOpenCancelInvoice] = useState(false);
 
@@ -158,8 +177,19 @@ export default function InvoiceDetail() {
                             alignItems={"center"}
                         >
                             <div className={cx("button-list")}>
-                                {currInvoice?.status === 1 &&
+                                {currInvoice?.payment_method !== 1 &&
+                                    currInvoice?.paid === 1 &&
                                     getInvoiceDetail?.length > 0 && (
+                                        <GButton
+                                            onClick={handleOpenConfirmPaid}
+                                        >
+                                            Xác nhận chuyển khoản
+                                        </GButton>
+                                    )}
+                                {currInvoice?.status === 1 &&
+                                    getInvoiceDetail?.length > 0 &&
+                                    (currInvoice?.paid === 2 ||
+                                        currInvoice?.payment_method === 1) && (
                                         <>
                                             <GButton
                                                 onClick={
@@ -210,6 +240,13 @@ export default function InvoiceDetail() {
                             " " +
                             currCustomerUser?.first_name,
                     }}
+                />
+
+                <ConfirmPaid
+                    isOpen={isOpenConfirmPaid}
+                    handleClose={handleCloseConfirmPaid}
+                    handleOpen={handleOpenConfirmPaid}
+                    currInvoice={currInvoice}
                 />
             </div>
         </>
