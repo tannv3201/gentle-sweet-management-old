@@ -39,7 +39,7 @@ export const getAllBooking = async (accessToken, dispatch, axiosJWT) => {
             },
         });
         dispatch(getAllBookingSuccess(res?.data));
-        return res?.data?.length;
+        return res?.data;
     } catch (error) {
         dispatch(getAllBookingFailed());
     }

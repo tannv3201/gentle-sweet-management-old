@@ -57,16 +57,29 @@ function Dashboard() {
     const [invoiceList, setInvoiceList] = useState([]);
     const [bookingList, setBookingList] = useState([]);
 
-    const getInvoiceList = useSelector(
-        (state) => state.invoice.invoice?.invoiceList
-    );
+    // const getInvoiceList = useSelector(
+    //     (state) => state.invoice.invoice?.invoiceList
+    // );
 
-    const getBookingList = useSelector(
-        (state) => state.booking.booking?.bookingList
-    );
+    // const getBookingList = useSelector(
+    //     (state) => state.booking.booking?.bookingList
+    // );
+
+    // console.log(getInvoiceList);
+    // console.log(getBookingList);
+
+    // Get province list from API
     useEffect(() => {
-        if (getInvoiceList?.length > 0) {
-            // Pending Invoice
+        const fetch = async () => {
+            if (getProvinceList?.length === 0) {
+                await provinceApi(dispatch);
+            }
+            const getInvoiceList = await getAllInvoice(
+                user?.accessToken,
+                dispatch,
+                axiosJWT
+            );
+
             const pendingInvoiceList = getInvoiceList?.filter(
                 (i) => i?.status === 1
             );
@@ -112,10 +125,12 @@ function Dashboard() {
                     icon: <CancelPresentationRounded htmlColor="#d32f2f" />,
                 },
             ]);
-        }
 
-        if (getBookingList?.length > 0) {
-            // Pending Invoice
+            const getBookingList = await getAllBooking(
+                user?.accessToken,
+                dispatch,
+                axiosJWT
+            );
             const pendingBookingList = getBookingList?.filter(
                 (i) => i?.status === 1
             );
@@ -161,17 +176,6 @@ function Dashboard() {
                     icon: <CancelPresentationRounded htmlColor="#d32f2f" />,
                 },
             ]);
-        }
-    }, []);
-    console.log(bookingList);
-    // Get province list from API
-    useEffect(() => {
-        const fetch = async () => {
-            if (getProvinceList?.length === 0) {
-                await provinceApi(dispatch);
-            }
-            await getAllInvoice(user?.accessToken, dispatch, axiosJWT);
-            await getAllBooking(user?.accessToken, dispatch, axiosJWT);
         };
 
         fetch();

@@ -39,7 +39,7 @@ export const getAllInvoice = async (accessToken, dispatch, axiosJWT) => {
             },
         });
         dispatch(getAllInvoiceSuccess(res?.data));
-        return res?.data?.length;
+        return res?.data;
     } catch (error) {
         dispatch(getAllInvoiceFailed());
     }

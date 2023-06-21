@@ -2,42 +2,9 @@ import React, { useEffect } from "react";
 
 import classNames from "classnames/bind";
 import styles from "./StatisticsCard.module.scss";
-import {
-    AssignmentTurnedInRounded,
-    CancelPresentationRounded,
-    DescriptionRounded,
-    HourglassTopRounded,
-    TaskRounded,
-} from "@mui/icons-material";
+
 import { Grid } from "@mui/material";
 const cx = classNames.bind(styles);
-
-const data = [
-    {
-        id: 1,
-        invoice_quantity: 20,
-        invoice_status_name: "Chờ xác nhận",
-        icon: <TaskRounded htmlColor="#f57c00" />,
-    },
-    {
-        id: 2,
-        invoice_quantity: 40,
-        invoice_status_name: "Đang xử lý",
-        icon: <HourglassTopRounded htmlColor="#0288d1" />,
-    },
-    {
-        id: 3,
-        invoice_quantity: 34,
-        invoice_status_name: "Hoàn thành",
-        icon: <AssignmentTurnedInRounded htmlColor="#2e7d32" />,
-    },
-    {
-        id: 3,
-        invoice_quantity: 34,
-        invoice_status_name: "Đã hủy",
-        icon: <CancelPresentationRounded htmlColor="#d32f2f" />,
-    },
-];
 
 function StatisticsCard({ title, data }) {
     return (
