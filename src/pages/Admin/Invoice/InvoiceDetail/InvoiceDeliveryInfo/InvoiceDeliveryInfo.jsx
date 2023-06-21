@@ -67,12 +67,11 @@ function InvoiceDeliveryInfo({
             }
         };
         fetch();
-    }, [invoiceId]);
+    }, [invoiceId, currInvoice?.admin_user_id]);
 
     useEffect(() => {
         if (getAdminUser) setAdminUser(structuredClone(getAdminUser));
     }, [getAdminUser]);
-    console.log(currInvoice);
     useEffect(() => {
         if (deliveryByInvoiceId) {
             setDeliveryClone({
@@ -163,8 +162,8 @@ function InvoiceDeliveryInfo({
                             label={"Nhân viên xác nhận"}
                             content={
                                 currInvoice?.admin_user_id
-                                    ? `${adminUser?.last_name} 
-                                      ${adminUser?.first_name}`
+                                    ? `${getAdminUser?.last_name} 
+                                      ${getAdminUser?.first_name}`
                                     : "--"
                             }
                         />

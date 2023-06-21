@@ -70,7 +70,7 @@ export const MainListItems = () => {
             />
             <MenuItem
                 to={"/booking"}
-                title={"Đặt lịch"}
+                title={"Lịch hẹn"}
                 icon={<ShoppingCart />}
             />
         </React.Fragment>

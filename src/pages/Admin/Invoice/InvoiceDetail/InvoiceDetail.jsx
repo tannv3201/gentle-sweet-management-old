@@ -29,7 +29,6 @@ import InvoiceDeliveryInfo from "./InvoiceDeliveryInfo/InvoiceDeliveryInfo";
 import ConfirmPaid from "./ConfirmInvoice/ConfirmPaid";
 
 const cx = classNames.bind(styles);
-
 export default function InvoiceDetail() {
     const { invoiceId } = useParams();
     dayjs.extend(utc);
@@ -98,13 +97,7 @@ export default function InvoiceDetail() {
                 user?.accessToken,
                 axiosJWT
             );
-            setCurrCustomerUser(
-                structuredClone(
-                    customerUserList?.find(
-                        (item) => item.id === invoice?.customer_user_id
-                    )
-                )
-            );
+            setCurrCustomerUser(user);
 
             await getDeliveryByInvoiceId(
                 dispatch,
@@ -153,6 +146,7 @@ export default function InvoiceDetail() {
     const handleCloseCancelInvoice = () => {
         setIsOpenCancelInvoice(false);
     };
+    console.log(currInvoice);
 
     return (
         <>

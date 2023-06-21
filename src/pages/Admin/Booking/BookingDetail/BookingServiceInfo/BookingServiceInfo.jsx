@@ -8,6 +8,11 @@ import { PriorityHighRounded, VisibilityRounded } from "@mui/icons-material";
 import GButton from "../../../../../components/MyButton/MyButton";
 import BookingStatusMenu from "../BookingStatusMenu/BookingStatusMenu";
 import ConfirmCancelBookingRequestPopup from "../BookingStatusMenu/ConfirmCancelBookingRequestPopup";
+import { useDispatch } from "react-redux";
+import { createAxios } from "../../../../../createInstance";
+import { loginSuccess } from "../../../../../redux/slice/authSlice";
+import { useParams } from "react-router-dom";
+import { getAdminUserById } from "../../../../../redux/api/apiAdminUser";
 
 const cx = classNames.bind(styles);
 
@@ -27,6 +32,8 @@ function BookingServiceInfo({
     currCustomerUser,
     currBookingCreator,
 }) {
+    const { bookingId } = useParams();
+
     const [bookingDetailClone, setBookingDetailClone] = useState({});
     const getBookingDetail = useSelector(
         (state) => state.bookingDetail.bookingDetail?.bookingDetailByBooking
@@ -48,6 +55,28 @@ function BookingServiceInfo({
         setIsOpenConfirmCancelInvoiceRequestPopup(false);
     };
 
+    const getAdminUser = useSelector(
+        (state) => state.adminUser.adminUser?.adminUser
+    );
+    const user = useSelector((state) => state.auth.login?.currentUser);
+
+    const dispatch = useDispatch();
+    let axiosJWT = createAxios(user, dispatch, loginSuccess);
+
+    useEffect(() => {
+        const fetch = async () => {
+            if (currBooking?.admin_user_id) {
+                getAdminUserById(
+                    dispatch,
+                    currBooking?.admin_user_id,
+                    user?.accessToken,
+                    axiosJWT
+                );
+            }
+        };
+        fetch();
+    }, [bookingId, currBooking?.admin_user_id]);
+
     return (
         <div className={cx("invoice-delivery-info-wrapper")}>
             <div className={cx("delivery-info-header")}>
@@ -59,7 +88,7 @@ function BookingServiceInfo({
                     {currBooking?.status === 7 && (
                         <div className={cx("cancel-request")}>
                             <PriorityHighRounded color="error" /> Yêu cầu hủy
-                            đơn hàng:
+                            lịch hẹn:
                             <div className={cx("cancel-request-action")}>
                                 <GButton
                                     onClick={
@@ -79,12 +108,12 @@ function BookingServiceInfo({
                 <Grid container spacing={2}>
                     <Grid item xs={6}>
                         <InfoItem
-                            label={"Người tạo"}
+                            label={"Nhân viên xác nhận"}
                             content={
-                                currBookingCreator?.id
-                                    ? `${currBookingCreator?.last_name} 
-                                      ${currBookingCreator?.first_name} - (ADMIN)`
-                                    : `${currCustomerUser?.last_name} ${currCustomerUser?.first_name} - (KH)`
+                                currBooking?.admin_user_id
+                                    ? `${getAdminUser?.last_name} 
+                                      ${getAdminUser?.first_name}`
+                                    : "--"
                             }
                         />
                     </Grid>

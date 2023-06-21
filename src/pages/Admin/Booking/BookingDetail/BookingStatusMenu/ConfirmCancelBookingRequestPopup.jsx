@@ -36,7 +36,7 @@ function ConfirmCancelBookingRequestPopup({
             user?.accessToken,
             dispatch,
             bookingId,
-            { status: 3 },
+            { status: 2 },
             axiosJWT
         ).then(() => {
             toast.success("Từ chối hủy lịch hẹn");
@@ -54,7 +54,7 @@ function ConfirmCancelBookingRequestPopup({
                 title="Yêu cầu hủy lịch hẹn"
             >
                 <div>
-                    <div style={{ padding: "12px 8px" }}>
+                    <div style={{ padding: "0 8px 12px " }}>
                         <span style={{ fontWeight: "var(--fw-medium)" }}>
                             {" "}
                             {`Lý do hủy lịch hẹn #${bookingId}: `} <br />
@@ -65,7 +65,7 @@ function ConfirmCancelBookingRequestPopup({
                                 fontStyle: "italic",
                             }}
                         >
-                            "{currBooking?.note}"
+                            " {currBooking?.note} "
                         </span>
                     </div>
                     <div style={{ paddingTop: "24px" }}>

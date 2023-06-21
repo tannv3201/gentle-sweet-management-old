@@ -29,6 +29,7 @@ export default function ConfirmPopup({
                 user?.accessToken,
                 dispatch,
                 selectedBooking?.booking_id,
+                user?.id,
                 axiosJWT
             ).then(() => {
                 handleClose();

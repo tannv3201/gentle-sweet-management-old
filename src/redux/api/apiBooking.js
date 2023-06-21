@@ -204,12 +204,18 @@ export const getBookingById = async (dispatch, id, accessToken, axiosJWT) => {
     }
 };
 
-export const confirmBooking = async (accessToken, dispatch, id, axiosJWT) => {
+export const confirmBooking = async (
+    accessToken,
+    dispatch,
+    id,
+    adminUserId,
+    axiosJWT
+) => {
     dispatch(confirmBookingStart());
     try {
         const res = await axiosJWT.put(
             "/v1/booking/confirm/" + id,
-            {},
+            { admin_user_id: adminUserId },
             {
                 headers: {
                     token: `Bearer ${accessToken}`,

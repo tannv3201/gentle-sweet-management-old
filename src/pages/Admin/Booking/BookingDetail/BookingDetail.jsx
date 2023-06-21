@@ -135,7 +135,6 @@ export default function BookingDetail() {
     const handleCloseCancelInvoice = () => {
         setIsOpenCancelBooking(false);
     };
-
     return (
         <>
             <GButton onClick={handleBack} startIcon={<ArrowBackIosNew />}>
