@@ -57,17 +57,6 @@ function Dashboard() {
     const [invoiceList, setInvoiceList] = useState([]);
     const [bookingList, setBookingList] = useState([]);
 
-    // const getInvoiceList = useSelector(
-    //     (state) => state.invoice.invoice?.invoiceList
-    // );
-
-    // const getBookingList = useSelector(
-    //     (state) => state.booking.booking?.bookingList
-    // );
-
-    // console.log(getInvoiceList);
-    // console.log(getBookingList);
-
     // Get province list from API
     useEffect(() => {
         const fetch = async () => {
