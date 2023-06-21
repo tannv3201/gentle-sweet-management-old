@@ -268,7 +268,7 @@ function InvoiceDeliveryInfo({
                                 label={"Phương thức thanh toán"}
                                 content={currInvoice?.paymentMethodName}
                             />
-                            {currInvoice?.payment_method > 1 && (
+                            {currInvoice?.payment_method > 1 ? (
                                 <div>
                                     <LightTooltip
                                         title={
@@ -276,6 +276,10 @@ function InvoiceDeliveryInfo({
                                                 ? "Chờ thanh toán"
                                                 : currInvoice?.paid === 2
                                                 ? "Đã thanh toán"
+                                                : currInvoice?.paid === 3
+                                                ? "Chờ hoàn tiền"
+                                                : currInvoice?.paid === 4
+                                                ? "Đã hoàn tiền"
                                                 : ""
                                         }
                                         placement="right"
@@ -291,6 +295,8 @@ function InvoiceDeliveryInfo({
                                         )}
                                     </LightTooltip>
                                 </div>
+                            ) : (
+                                "--"
                             )}
                         </div>
                     </Grid>

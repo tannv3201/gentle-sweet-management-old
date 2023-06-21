@@ -18,13 +18,25 @@ function ConfirmCancelInvoiceRequestPopup({
     const user = useSelector((state) => state.auth.login?.currentUser);
     const dispatch = useDispatch();
     let axiosJWT = createAxios(user, dispatch, loginSuccess);
-
+    console.log(currInvoice);
     const handleCancelInvoice = async () => {
         await updateInvoice(
             user?.accessToken,
             dispatch,
             invoiceId,
-            { status: 6 },
+            {
+                status: 6,
+                paid:
+                    currInvoice?.paid === 0
+                        ? 0
+                        : currInvoice?.paid === 1
+                        ? 1
+                        : currInvoice?.paid === 3
+                        ? 4
+                        : currInvoice?.paid === 4
+                        ? 4
+                        : "",
+            },
             axiosJWT
         ).then(() => {
             toast.success("Hủy đơn hàng thành công");
@@ -55,20 +67,20 @@ function ConfirmCancelInvoiceRequestPopup({
             >
                 <div>
                     <div style={{ padding: "12px 8px" }}>
-                        <span style={{ fontWeight: "var(--fw-medium)" }}>
-                            {" "}
+                        <div style={{ fontWeight: "var(--fw-medium)" }}>
                             {`Lý do hủy đơn hàng #${invoiceId}: `} <br />
-                        </span>
-                        <span
-                            style={{
-                                display: "block",
-                                fontStyle: "italic",
-                            }}
-                        >
-                            "{currInvoice?.note}"
-                        </span>
+                        </div>
+                        <br />
+                        <div>" {currInvoice?.note} "</div>
+                        <br />
+                        {currInvoice?.payment_method > 1 && (
+                            <div style={{ fontStyle: "italic" }}>
+                                <span style={{ color: "red" }}>*</span>Lưu ý
+                                hoàn tiền trước khi thực hiện hủy đơn hàng.
+                            </div>
+                        )}
                     </div>
-                    <div style={{ paddingTop: "24px" }}>
+                    <div>
                         <GButton
                             color={"success"}
                             onClick={handleCancelInvoice}
