@@ -20,7 +20,7 @@ function InfoItem({ label, content }) {
     );
 }
 
-function InvoiceCustomerInfo({ currInvoice, currCustomerUser }) {
+function InvoiceCustomerInfo({ currInvoice }) {
     const [deliveryClone, setDeliveryClone] = useState({});
     const deliveryByInvoiceId = useSelector(
         (state) => state.delivery.delivery?.deliveryByInvoiceId
@@ -89,7 +89,7 @@ function InvoiceCustomerInfo({ currInvoice, currCustomerUser }) {
                         <Grid item xs={12}>
                             <InfoItem
                                 label={"Khách hàng"}
-                                content={`${currCustomerUser?.last_name} ${currCustomerUser?.first_name}`}
+                                content={currInvoice?.customerName}
                             />
                         </Grid>
                     </Grid>

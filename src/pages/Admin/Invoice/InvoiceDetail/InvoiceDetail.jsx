@@ -27,6 +27,7 @@ import { getDeliveryByInvoiceId } from "../../../../redux/api/apiDelivery";
 import InvoiceCustomerInfo from "./InvoiceCustomerInfo/InvoiceCustomerInfo";
 import InvoiceDeliveryInfo from "./InvoiceDeliveryInfo/InvoiceDeliveryInfo";
 import ConfirmPaid from "./ConfirmInvoice/ConfirmPaid";
+import ConfirmRefund from "./ConfirmInvoice/ConfirmRefund";
 
 const cx = classNames.bind(styles);
 export default function InvoiceDetail() {
@@ -34,7 +35,6 @@ export default function InvoiceDetail() {
     dayjs.extend(utc);
     const [isEditting, setIsEditting] = useState(false);
     const user = useSelector((state) => state.auth.login?.currentUser);
-    const [currCustomerUser, setCurrCustomerUser] = useState({});
     const [currInvoiceVerifier, setCurrInvoiceVerifier] = useState({});
     const [currInvoice, setCurrInvoice] = useState({});
     const dispatch = useDispatch();
@@ -79,6 +79,8 @@ export default function InvoiceDetail() {
                         : getInvoice?.payment_method === 3
                         ? "Ví điện tử"
                         : "",
+                customerName:
+                    getInvoice?.last_name + " " + getInvoice?.first_name,
             })
         );
     }, [getInvoice]);
@@ -97,7 +99,6 @@ export default function InvoiceDetail() {
                 user?.accessToken,
                 axiosJWT
             );
-            setCurrCustomerUser(user);
 
             await getDeliveryByInvoiceId(
                 dispatch,
@@ -136,6 +137,17 @@ export default function InvoiceDetail() {
         setIsOpenConfirmPaid(false);
     };
 
+    // Confirm refund
+    const [isOpenConfirmRefund, setIsOpenConfirmRefund] = useState(false);
+
+    const handleOpenConfirmRefund = () => {
+        setIsOpenConfirmRefund(true);
+    };
+
+    const handleCloseConfirmRefund = () => {
+        setIsOpenConfirmRefund(false);
+    };
+
     // Cancel invoice
     const [isOpenCancelInvoice, setIsOpenCancelInvoice] = useState(false);
 
@@ -171,7 +183,8 @@ export default function InvoiceDetail() {
                             alignItems={"center"}
                         >
                             <div className={cx("button-list")}>
-                                {currInvoice?.payment_method !== 1 &&
+                                {currInvoice?.status === 1 &&
+                                    currInvoice?.payment_method !== 1 &&
                                     currInvoice?.paid === 1 &&
                                     getInvoiceDetail?.length > 0 && (
                                         <GButton
@@ -180,6 +193,11 @@ export default function InvoiceDetail() {
                                             Xác nhận chuyển khoản
                                         </GButton>
                                     )}
+                                {currInvoice?.paid === 3 && (
+                                    <GButton onClick={handleOpenConfirmRefund}>
+                                        Xác nhận hoàn tiền
+                                    </GButton>
+                                )}
                                 {currInvoice?.status === 1 &&
                                     getInvoiceDetail?.length > 0 &&
                                     (currInvoice?.paid === 2 ||
@@ -200,13 +218,9 @@ export default function InvoiceDetail() {
                     </Grid>
                 </div>
 
-                <InvoiceCustomerInfo
-                    currInvoice={currInvoice}
-                    currCustomerUser={currCustomerUser}
-                />
+                <InvoiceCustomerInfo currInvoice={currInvoice} />
                 <InvoiceDeliveryInfo
                     currInvoice={currInvoice}
-                    currCustomerUser={currCustomerUser}
                     currInvoiceVerifier={currInvoiceVerifier}
                 />
                 <InvoiceDetailList isEditting={isEditting} />
@@ -216,10 +230,7 @@ export default function InvoiceDetail() {
                     handleClose={handleCloseConfirmInvoice}
                     selectedInvoice={{
                         invoice_id: invoiceId,
-                        customer_name:
-                            currCustomerUser?.last_name +
-                            " " +
-                            currCustomerUser?.first_name,
+                        customer_name: currInvoice?.customerName,
                     }}
                 />
 
@@ -229,10 +240,7 @@ export default function InvoiceDetail() {
                     handleClose={handleCloseCancelInvoice}
                     selectedInvoice={{
                         invoice_id: invoiceId,
-                        customer_name:
-                            currCustomerUser?.last_name +
-                            " " +
-                            currCustomerUser?.first_name,
+                        customer_name: currInvoice?.customerName,
                     }}
                 />
 
@@ -240,6 +248,13 @@ export default function InvoiceDetail() {
                     isOpen={isOpenConfirmPaid}
                     handleClose={handleCloseConfirmPaid}
                     handleOpen={handleOpenConfirmPaid}
+                    currInvoice={currInvoice}
+                />
+
+                <ConfirmRefund
+                    isOpen={isOpenConfirmRefund}
+                    handleClose={handleCloseConfirmRefund}
+                    handleOpen={handleOpenConfirmRefund}
                     currInvoice={currInvoice}
                 />
             </div>
