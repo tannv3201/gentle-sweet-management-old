@@ -58,10 +58,18 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
             (state) => state.customerUser.customerUser?.customerUserList
         )
     );
+
+    const getBranchList = useSelector(
+        (state) => state.branch.branch?.branchList
+    );
+
     const [searchParams, setSearchParams] = useSearchParams();
     const [status, setStatus] = useState(searchParams.get("status") || null);
     const [customerUserId, setCustomerUserId] = useState(
         searchParams.get("customer_user_id") || null
+    );
+    const [branchId, setBranchId] = useState(
+        searchParams.get("branch_id") || null
     );
     const [startDate, setStartDate] = useState(
         searchParams.get("startDate") || null
@@ -83,6 +91,7 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
                     {
                         status: status,
                         customer_user_id: customerUserId,
+                        branch_id: branchId,
                         startDate: startDate,
                         endDate: endDate,
                     },
@@ -94,6 +103,7 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
                 if (status) newSearchParams.set("status", status);
                 if (customerUserId)
                     newSearchParams.set("customer_user_id", customerUserId);
+                if (branchId) newSearchParams.set("branch_id", branchId);
                 if (startDate) newSearchParams.set("startDate", startDate);
                 if (endDate) newSearchParams.set("endDate", endDate);
                 setSearchParams(newSearchParams);
@@ -102,7 +112,7 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
             }
         };
         fetch();
-    }, [submitClicked, customerUserId, endDate, startDate, status]);
+    }, [submitClicked, customerUserId, endDate, startDate, status, branchId]);
 
     const handleSearch = () => {
         setSubmitClicked(true);
@@ -132,7 +142,7 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
             >
                 <div className={cx("search-box")}>
                     <Grid container spacing={2}>
-                        <Grid item xs={4}>
+                        <Grid item xs={3}>
                             <Autocomplete
                                 options={bookingStatus}
                                 getOptionLabel={(option) =>
@@ -208,7 +218,42 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
                                 )}
                             />
                         </Grid> */}
-                        <Grid item xs={4}>
+                        <Grid item xs={3}>
+                            <Autocomplete
+                                options={getBranchList}
+                                getOptionLabel={(option) =>
+                                    option?.name || null
+                                }
+                                onChange={(e, value) => {
+                                    setBranchId(value?.id);
+                                }}
+                                isOptionEqualToValue={(option, value) =>
+                                    value === null ||
+                                    value === "" ||
+                                    option?.id === value?.id
+                                }
+                                value={
+                                    branchId
+                                        ? {
+                                              id: branchId,
+                                              name: getBranchList?.find(
+                                                  (i) =>
+                                                      i.id ===
+                                                      parseInt(branchId)
+                                              )?.name,
+                                          }
+                                        : null
+                                }
+                                renderInput={(params) => (
+                                    <GTextFieldNormal
+                                        {...params}
+                                        fullWidth
+                                        label="Chọn chi nhánh"
+                                    />
+                                )}
+                            />
+                        </Grid>
+                        <Grid item xs={3}>
                             <GDatePicker
                                 label={"Từ ngày"}
                                 fullWidth
@@ -221,7 +266,7 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
                                 value={startDate ? dayjs(startDate) : null}
                             />
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={3}>
                             <GDatePicker
                                 label={"Đến ngày"}
                                 fullWidth
