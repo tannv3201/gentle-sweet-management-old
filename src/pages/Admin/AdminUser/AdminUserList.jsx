@@ -27,7 +27,6 @@ export default function AdminUserList({ data }) {
     const adminUserList = useSelector(
         (state) => state.adminUser.adminUser?.allAdminUser
     );
-    const branchList = useSelector((state) => state.branch.branch?.branchList);
 
     useEffect(() => {
         if (!user) {
@@ -36,14 +35,10 @@ export default function AdminUserList({ data }) {
         if (user?.accessToken && adminUserList?.length === 0) {
             getAllUser(user?.accessToken, dispatch, axiosJWT);
         }
-        if (branchList?.length === 0) {
-            getAllBranch(dispatch);
-        }
     }, []);
 
     useEffect(() => {
         const newList = adminUserList?.map((user) => {
-            const branch = branchList?.find((b) => b.id === user?.branch_id);
             return {
                 ...user,
                 role_name:
@@ -53,7 +48,6 @@ export default function AdminUserList({ data }) {
                         ? "STAFF"
                         : "",
                 fullName: user?.last_name + " " + user?.first_name,
-                branchName: branch?.name,
             };
         });
 
@@ -103,7 +97,6 @@ export default function AdminUserList({ data }) {
                 title={"DANH SÁCH NGƯỜI DÙNG HỆ THỐNG"}
                 columns={[
                     { title: "Tên tài khoản", field: "name" },
-                    { title: "Cơ sở", field: "branchName" },
                     { title: "Email", field: "email" },
                     { title: "Quyền hạn", field: "role_name" },
                     {

@@ -82,9 +82,13 @@ function App() {
                                 path={route?.path}
                                 element={
                                     user ? (
-                                        <Layout>
-                                            <Page />
-                                        </Layout>
+                                        accessRoute ? (
+                                            <Layout>
+                                                <Page />
+                                            </Layout>
+                                        ) : (
+                                            <NotFoundPage />
+                                        )
                                     ) : (
                                         <Navigate to="/dang-nhap" replace />
                                     )

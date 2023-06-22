@@ -50,6 +50,7 @@ export default function BookingDetail() {
     const getBookingDetail = useSelector(
         (state) => state.bookingDetail.bookingDetail?.bookingDetailByBooking
     );
+
     useEffect(() => {
         setCurrBooking(
             structuredClone({
@@ -181,7 +182,10 @@ export default function BookingDetail() {
                     currCustomerUser={currCustomerUser}
                 />
                 <BookingServiceInfo
-                    currBooking={currBooking}
+                    currBooking={{
+                        ...currBooking,
+                        branch_id: getBookingDetail[0]?.branch_id,
+                    }}
                     currCustomerUser={currCustomerUser}
                     currBookingCreator={currBookingCreator}
                 />

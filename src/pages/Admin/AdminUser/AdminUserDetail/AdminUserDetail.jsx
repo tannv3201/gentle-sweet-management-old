@@ -20,17 +20,9 @@ import { ArrowBackIosNew, ModeEditOutlineRounded } from "@mui/icons-material";
 import GTextFieldNormal from "../../../../components/GTextField/GTextFieldNormal";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import GDatePicker from "../../../../components/GDatePicker/GDatePicker";
 import { useParams } from "react-router-dom";
 import utc from "dayjs/plugin/utc";
 import PasswordMenu from "./PasswordMenu/PasswordMenu";
-import {
-    districtApi,
-    getDistrictById,
-    getProvinceById,
-    getWardById,
-    wardApi,
-} from "../../../../redux/api/apiProvinceOpenAPI";
 
 const cx = classNames.bind(styles);
 export default function AdminUserDetail() {
@@ -43,9 +35,7 @@ export default function AdminUserDetail() {
     );
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [selectedProvince, setSelectedProvince] = useState(null);
-    const [selectedDistrict, setSelectedDistrict] = useState(null);
-    const [selectedWard, setSelectedWard] = useState(null);
+
     const [cloneData, setCloneData] = useState([]);
 
     useEffect(() => {
@@ -88,7 +78,6 @@ export default function AdminUserDetail() {
     };
 
     // Validate
-    const phoneRegExp = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
     const validationSchema = Yup.object().shape({
         role_id: Yup.string().required("Vui lòng không để trống"),
         name: Yup.string().required("Vui lòng không để trống"),
@@ -107,13 +96,11 @@ export default function AdminUserDetail() {
                 password,
                 role_name,
                 editState,
-                branch,
                 id,
                 ...restData
             } = data;
             const dataFinal = {
                 ...restData,
-                branch_id: branch?.id,
             };
             handleUpdateAdminUser(dataFinal);
         },
@@ -128,20 +115,9 @@ export default function AdminUserDetail() {
             formik.setFieldValue("role_name", null);
         }
     };
-    const handleChangeBranch = (data) => {
-        if (data) {
-            formik.setFieldValue("branch", { id: data?.id, name: data?.name });
-        } else {
-            formik.setFieldValue("branch", null);
-        }
-    };
-    const branchList = useSelector((state) => state.branch.branch?.branchList);
 
     useEffect(() => {
         if (cloneData) {
-            const branch = branchList?.find(
-                (b) => b.id === cloneData?.branch_id
-            );
             setAdminUser({
                 id: cloneData?.id,
                 role_id: cloneData?.role_id || null,
@@ -152,8 +128,6 @@ export default function AdminUserDetail() {
                         ? "STAFF"
                         : "",
                 name: cloneData?.name,
-                branch_id: cloneData?.branch_id,
-                branch: branch,
                 email: cloneData.email,
                 password: "",
                 confirmPassword: "",
@@ -221,6 +195,18 @@ export default function AdminUserDetail() {
                 <div className={cx("wrapper-body")}>
                     <form onSubmit={formik.handleSubmit}>
                         <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <GTextFieldNormal
+                                    disabled={!isEditting}
+                                    onChange={formik.handleChange}
+                                    label="Tên nhân viên"
+                                    fullWidth
+                                    name="name"
+                                    value={formik.values?.name || ""}
+                                    formik={formik}
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                            </Grid>
                             <Grid item xs={6}>
                                 <Autocomplete
                                     disabled={!isEditting}
@@ -256,47 +242,7 @@ export default function AdminUserDetail() {
                                     )}
                                 />
                             </Grid>
-                            <Grid item xs={6}>
-                                <Autocomplete
-                                    disabled={!isEditting}
-                                    options={branchList}
-                                    getOptionLabel={(option) =>
-                                        `${option?.name}` || ""
-                                    }
-                                    onChange={(e, value) => {
-                                        handleChangeBranch(value);
-                                    }}
-                                    onBlur={formik.handleBlur}
-                                    isOptionEqualToValue={(option, value) =>
-                                        value === null ||
-                                        value === "" ||
-                                        option?.id === value?.id
-                                    }
-                                    value={formik.values?.branch || null}
-                                    renderInput={(params) => (
-                                        <GTextFieldNormal
-                                            {...params}
-                                            name="branch_id"
-                                            fullWidth
-                                            label="Cơ sở"
-                                            formik={formik}
-                                            InputLabelProps={{ shrink: true }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <GTextFieldNormal
-                                    disabled={!isEditting}
-                                    onChange={formik.handleChange}
-                                    label="Tên tài khoản"
-                                    fullWidth
-                                    name="name"
-                                    value={formik.values?.name || ""}
-                                    formik={formik}
-                                    InputLabelProps={{ shrink: true }}
-                                />
-                            </Grid>
+
                             <Grid item xs={6}>
                                 <GTextFieldNormal
                                     disabled={!isEditting}

@@ -13,6 +13,14 @@ import { createAxios } from "../../../../../createInstance";
 import { loginSuccess } from "../../../../../redux/slice/authSlice";
 import { useParams } from "react-router-dom";
 import { getAdminUserById } from "../../../../../redux/api/apiAdminUser";
+import { getAllBranch } from "../../../../../redux/api/apiBranch";
+import {
+    districtApi,
+    getDistrictById,
+    getProvinceById,
+    getWardById,
+    wardApi,
+} from "../../../../../redux/api/apiProvinceOpenAPI";
 
 const cx = classNames.bind(styles);
 
@@ -62,7 +70,14 @@ function BookingServiceInfo({
 
     const dispatch = useDispatch();
     let axiosJWT = createAxios(user, dispatch, loginSuccess);
-
+    const branchList = useSelector((state) => state.branch.branch?.branchList);
+    const [bookingBranch, setBookingBranch] = useState({});
+    const getProvinceList = structuredClone(
+        useSelector((state) => state.province.province.provinceList)
+    );
+    const [selectedProvince, setSelectedProvince] = useState("");
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedWard, setSelectedWard] = useState("");
     useEffect(() => {
         const fetch = async () => {
             if (currBooking?.admin_user_id) {
@@ -73,6 +88,40 @@ function BookingServiceInfo({
                     axiosJWT
                 );
             }
+            if (branchList?.length === 0) {
+                await getAllBranch(dispatch);
+            }
+            const getBranchInBooking = branchList?.find(
+                (b) => b.id === currBooking?.branch_id
+            );
+            setBookingBranch(getBranchInBooking);
+
+            const provinceSelected = getProvinceById(
+                getBranchInBooking?.province,
+                getProvinceList
+            );
+            setSelectedProvince(provinceSelected?.name);
+            // District
+
+            await districtApi(parseInt(getBranchInBooking?.province)).then(
+                (districtList) => {
+                    const districtSelected = getDistrictById(
+                        getBranchInBooking?.district,
+                        districtList
+                    );
+                    setSelectedDistrict(districtSelected?.name);
+                }
+            );
+
+            await wardApi(parseInt(getBranchInBooking?.district)).then(
+                (wardList) => {
+                    const wardSelected = getWardById(
+                        getBranchInBooking?.ward,
+                        wardList
+                    );
+                    setSelectedWard(wardSelected?.name);
+                }
+            );
         };
         fetch();
     }, [bookingId, currBooking?.admin_user_id]);
@@ -111,8 +160,7 @@ function BookingServiceInfo({
                             label={"Nhân viên xác nhận"}
                             content={
                                 currBooking?.admin_user_id
-                                    ? `${getAdminUser?.last_name} 
-                                      ${getAdminUser?.first_name}`
+                                    ? `${getAdminUser?.name}`
                                     : "--"
                             }
                         />
@@ -124,6 +172,24 @@ function BookingServiceInfo({
                                 currBooking?.created_at,
                                 "DD-MM-YYYY | HH:mm"
                             )}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <InfoItem
+                            label={"Tên chi nhánh"}
+                            content={bookingBranch?.name}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <InfoItem
+                            label={"Địa chỉ chi nhánh"}
+                            content={`${bookingBranch?.detail_address}, ${selectedWard}, ${selectedDistrict}, ${selectedProvince}`}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <InfoItem
+                            label={"Số điện thoại liên hệ"}
+                            content={bookingBranch?.phone_number}
                         />
                     </Grid>
                     <Grid item xs={6}>
