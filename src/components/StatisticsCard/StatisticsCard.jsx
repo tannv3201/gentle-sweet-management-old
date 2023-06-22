@@ -4,9 +4,10 @@ import classNames from "classnames/bind";
 import styles from "./StatisticsCard.module.scss";
 
 import { Grid } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 const cx = classNames.bind(styles);
 
-function StatisticsCard({ title, data }) {
+function StatisticsCard({ title, data, handleNavigate }) {
     return (
         <>
             <div className={cx("statistics-card-wrapper")}>
@@ -17,7 +18,10 @@ function StatisticsCard({ title, data }) {
                     <Grid container spacing={1.5}>
                         {data?.map((invoice, idx) => (
                             <Grid key={idx} item xs={3}>
-                                <div className={cx("children-item")}>
+                                <div
+                                    className={cx("children-item")}
+                                    onClick={handleNavigate}
+                                >
                                     <div className={cx("children-item-header")}>
                                         {invoice?.icon}
                                         <span className={cx("item-title")}>

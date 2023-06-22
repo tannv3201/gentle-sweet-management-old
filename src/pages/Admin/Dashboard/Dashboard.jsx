@@ -17,6 +17,7 @@ import {
 } from "@mui/icons-material";
 import { getAllBooking } from "../../../redux/api/apiBooking";
 import { getAllBranch } from "../../../redux/api/apiBranch";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 const data = [
@@ -173,6 +174,15 @@ function Dashboard() {
         fetch();
     }, []);
 
+    const navigate = useNavigate();
+    const handleNavigateToBooking = () => {
+        navigate("/booking");
+    };
+
+    const handleNavigateToInvoice = () => {
+        navigate("/invoice");
+    };
+
     return (
         <>
             <Grid container spacing={2}>
@@ -183,12 +193,14 @@ function Dashboard() {
                                 <StatisticsCard
                                     title={"Đơn hàng"}
                                     data={invoiceList}
+                                    handleNavigate={handleNavigateToInvoice}
                                 />
                             </Grid>
                             <Grid item xs={12}>
                                 <StatisticsCard
                                     title={"Lịch hẹn"}
                                     data={bookingList}
+                                    handleNavigate={handleNavigateToBooking}
                                 />
                             </Grid>
                         </Grid>

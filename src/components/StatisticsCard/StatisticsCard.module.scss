@@ -19,6 +19,9 @@
         .children-item {
             padding: 4px;
             border: 1px solid var(--border-color);
+            &:hover {
+                cursor: pointer;
+            }
             .children-item-header {
                 display: flex;
                 align-items: center;
