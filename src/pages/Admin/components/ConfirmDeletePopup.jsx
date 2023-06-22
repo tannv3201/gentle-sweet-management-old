@@ -12,6 +12,7 @@ function ConfirmDeletePopup({
     confimQuestion1,
     confimQuestion2,
     title,
+    colorButton,
 }) {
     return (
         <>
@@ -41,7 +42,10 @@ function ConfirmDeletePopup({
                         {"  "}?
                     </div>
                     <div style={{ paddingTop: "24px" }}>
-                        <GButton color={"error"} onClick={handleDelete}>
+                        <GButton
+                            color={colorButton ? colorButton : "error"}
+                            onClick={handleDelete}
+                        >
                             Xác nhận
                         </GButton>
                         <GButton

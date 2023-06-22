@@ -55,6 +55,7 @@ export default function ConfirmPopup({
                 deleteQuestion="Bạn có muốn xác nhận đơn hàng của khách hàng"
                 deleteLabel={selectedInvoice?.customer_name}
                 handleDelete={handleConfirmInvoice}
+                colorButton={"success"}
             />
         </>
     );

@@ -45,6 +45,7 @@ export default function ConfirmPopup({
                 deleteQuestion="Bạn có muốn xác nhận lịch hẹn của khách hàng"
                 deleteLabel={selectedBooking?.customer_name}
                 handleDelete={handleConfirmBooking}
+                colorButton={"success"}
             />
         </>
     );
