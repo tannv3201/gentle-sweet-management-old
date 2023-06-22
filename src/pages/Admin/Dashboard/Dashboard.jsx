@@ -16,6 +16,7 @@ import {
     TaskRounded,
 } from "@mui/icons-material";
 import { getAllBooking } from "../../../redux/api/apiBooking";
+import { getAllBranch } from "../../../redux/api/apiBranch";
 
 const cx = classNames.bind(styles);
 const data = [
@@ -60,6 +61,8 @@ function Dashboard() {
     // Get province list from API
     useEffect(() => {
         const fetch = async () => {
+            await getAllBranch(dispatch);
+
             if (getProvinceList?.length === 0) {
                 await provinceApi(dispatch);
             }

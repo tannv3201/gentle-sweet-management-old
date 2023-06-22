@@ -90,11 +90,9 @@ export default function MenuUser() {
         handleClose();
     };
 
-    const nameAvatar =
-        currentUser?.first_name?.charAt(0) + currentUser?.last_name?.charAt(0);
+    const nameAvatar = currentUser?.name?.charAt(0);
 
-    const fullName =
-        currentUser?.first_name + " " + currentUser?.last_name?.split(" ")[0];
+    const fullName = currentUser?.name;
 
     return (
         <div>

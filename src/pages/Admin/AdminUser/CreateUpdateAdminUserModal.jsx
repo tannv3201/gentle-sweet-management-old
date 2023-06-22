@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import GButton from "../../../components/MyButton/MyButton";
-import { Autocomplete, Grid, InputAdornment } from "@mui/material";
+import { Autocomplete, Grid, InputAdornment, TextField } from "@mui/material";
 import { useState } from "react";
 import * as Yup from "yup";
 import GModal from "../../../components/GModal/GModal";
@@ -19,6 +19,7 @@ import {
     provinceApi,
     wardApi,
 } from "../../../redux/api/apiProvinceOpenAPI";
+import { getAllBranch } from "../../../redux/api/apiBranch";
 
 const roleList = [
     {
@@ -43,61 +44,42 @@ export default function CreateUpdateAdminUserModal({
     const dispatch = useDispatch();
     const [adminUser, setAdminUser] = useState({
         id: "",
+        branch_id: "",
         role_id: "",
         role_name: "",
-        birth_date: "",
         email: "",
-        phone_number: "",
-        first_name: "",
-        last_name: "",
-        province: "",
-        district: "",
-        ward: "",
-        detail_address: "",
+        name: "",
         password: "",
         confirmPassword: "",
     });
 
     let axiosJWT = createAxios(user, dispatch, loginSuccess);
 
-    const handleCreateAdminUser = (adminUser) => {
-        createAdminUser(user?.accessToken, dispatch, adminUser, axiosJWT).then(
-            () => {
-                handleCloseModal();
-            }
-        );
+    const handleCreateAdminUser = async (adminUser) => {
+        await createAdminUser(
+            user?.accessToken,
+            dispatch,
+            adminUser,
+            axiosJWT
+        ).then(() => {
+            handleCloseModal();
+        });
     };
 
     // Validate
     const phoneRegExp = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
     const validationSchema = Yup.object().shape({
         role_id: Yup.string().required("Vui lòng không để trống"),
+        branch_id: Yup.string().required("Vui lòng không để trống"),
         password: Yup.string()
             .required("Vui lòng không để trống")
             .min(8, "Mật khẩu phải có ít nhất 8 kí tự")
             .max(20, "Mật khẩu tối đa 20 kí tự"),
-        first_name: Yup.string().required("Vui lòng không để trống"),
-        phone_number: Yup.string()
-            .matches(/^\d+$/, "Số điện thoại chỉ bao gồm các ký tự số")
-            .matches(phoneRegExp, "Số điện thoại không hợp lệ")
-            .required("Vui lòng nhập số điện thoại"),
-        last_name: Yup.string().required("Vui lòng không để trống"),
+        name: Yup.string().required("Vui lòng không để trống"),
         email: Yup.string()
             .email("Vui lòng nhập địa chỉ email hợp lệ")
             .required("Vui lòng không để trống"),
         confirmPassword: Yup.string().required("Vui lòng không để trống"),
-        province: Yup.string().required("Vui lòng không để trống"),
-        district: Yup.string().required("Vui lòng không để trống"),
-        ward: Yup.string().required("Vui lòng không để trống"),
-        detail_address: Yup.string().required("Vui lòng không để trống"),
-        birth_date: Yup.date()
-            .required("Vui lòng nhập ngày sinh")
-            .typeError("Ngày không hợp lệ")
-            .max(new Date(), "Ngày sinh không được lớn hơn ngày hiện tại")
-            .min(
-                new Date("1900-01-01"),
-                "Ngày sinh không được nhỏ hơn 01/01/1900"
-            ),
     });
 
     const handleCloseModal = () => {
@@ -116,15 +98,10 @@ export default function CreateUpdateAdminUserModal({
         initialValues: adminUser,
         validationSchema: validationSchema,
         onSubmit: (data) => {
-            const { confirmPassword, role_name, editState, ...restData } = data;
-            const dataFinal = {
-                ...restData,
-                birth_date: dayjs
-                    .utc(data?.birth_date)
-                    .utcOffset("+07:00")
-                    .format("YYYY/MM/DD"),
-            };
-            handleCreateAdminUser(dataFinal);
+            const { id, confirmPassword, role_name, editState, ...restData } =
+                data;
+
+            handleCreateAdminUser(restData);
         },
     });
 
@@ -141,8 +118,17 @@ export default function CreateUpdateAdminUserModal({
     );
 
     // Get province list from API
+    const getBranch = useSelector((state) => state.branch.branch?.branchList);
+
     useEffect(() => {
-        setProvinces(getProvinceList);
+        const fetch = async () => {
+            setProvinces(getProvinceList);
+
+            if (getBranch?.length === 0) {
+                await getAllBranch(dispatch);
+            }
+        };
+        fetch();
     }, []);
 
     // Fn handle province onChange event
@@ -209,6 +195,18 @@ export default function CreateUpdateAdminUserModal({
             formik.setFieldValue("role_name", null);
         }
     };
+    const [selectedBranch, setSelectedBranch] = useState({});
+
+    const handleChangeBranch = (value) => {
+        if (value) {
+            formik.setFieldValue("branch_id", value?.id);
+            setSelectedBranch(value);
+        } else {
+            formik.setFieldValue("branch_id", null);
+            setSelectedBranch("");
+        }
+    };
+
     return (
         <>
             <GModal
@@ -252,49 +250,47 @@ export default function CreateUpdateAdminUserModal({
                                         fullWidth
                                         label="Quyền hạn"
                                         formik={formik}
+                                        InputLabelProps={{ shrink: true }}
                                     />
                                 )}
                             />
                         </Grid>
                         <Grid item xs={6}>
-                            <GDatePicker
-                                label={"Ngày sinh"}
+                            <Autocomplete
+                                options={getBranch}
                                 onBlur={formik.handleBlur}
-                                fullWidth
-                                name="birth_date"
-                                onChange={(date) => handleChangeBirthDate(date)}
-                                value={formik.values?.birth_date || null}
-                                formik={formik}
-                                error={
-                                    formik?.touched?.birth_date &&
-                                    Boolean(formik?.errors?.birth_date)
+                                getOptionLabel={(option) => option.name || ""}
+                                isOptionEqualToValue={(option, value) =>
+                                    value?.id === option?.id
                                 }
-                                helperText={
-                                    formik?.touched?.birth_date &&
-                                    formik?.errors?.birth_date
-                                }
+                                onChange={(event, value) => {
+                                    handleChangeBranch(value);
+                                }}
+                                value={selectedBranch || null}
+                                renderInput={(params) => (
+                                    <GTextFieldNormal
+                                        {...params}
+                                        fullWidth
+                                        label="Chọn cơ sở"
+                                        name="branch_id"
+                                        InputLabelProps={{ shrink: true }}
+                                        formik={formik}
+                                    />
+                                )}
                             />
                         </Grid>
                         <Grid item xs={6}>
                             <GTextFieldNormal
                                 onChange={formik.handleChange}
-                                label="Họ"
+                                label="Tên tài khoản"
                                 fullWidth
-                                name="last_name"
-                                value={formik.values?.last_name || ""}
+                                name="name"
+                                value={formik.values?.name || ""}
                                 formik={formik}
+                                InputLabelProps={{ shrink: true }}
                             />
                         </Grid>
-                        <Grid item xs={6}>
-                            <GTextFieldNormal
-                                onChange={formik.handleChange}
-                                label="Tên"
-                                fullWidth
-                                name="first_name"
-                                value={formik.values?.first_name || ""}
-                                formik={formik}
-                            />
-                        </Grid>
+
                         <Grid item xs={6}>
                             <GTextFieldNormal
                                 onChange={formik.handleChange}
@@ -315,98 +311,13 @@ export default function CreateUpdateAdminUserModal({
                         <Grid item xs={6}>
                             <GTextFieldNormal
                                 onChange={formik.handleChange}
-                                label="Số điện thoại"
-                                fullWidth
-                                name="phone_number"
-                                value={formik.values?.phone_number || ""}
-                                formik={formik}
-                            />
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Autocomplete
-                                options={provinces}
-                                onBlur={formik.handleBlur}
-                                getOptionLabel={(option) => option.name}
-                                isOptionEqualToValue={(option, value) =>
-                                    value?.code === option?.code
-                                }
-                                onChange={handleProvinceChange}
-                                value={selectedProvince || null}
-                                renderInput={(params) => (
-                                    <GTextFieldNormal
-                                        {...params}
-                                        label="Tỉnh/Thành phố"
-                                        variant="outlined"
-                                        name="province"
-                                        formik={formik}
-                                    />
-                                )}
-                            />
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Autocomplete
-                                options={districts}
-                                onBlur={formik.handleBlur}
-                                getOptionLabel={(option) => option.name}
-                                isOptionEqualToValue={(option, value) =>
-                                    value?.code === option?.code
-                                }
-                                onChange={handleDistrictChange}
-                                value={selectedDistrict || null}
-                                renderInput={(params) => (
-                                    <GTextFieldNormal
-                                        {...params}
-                                        label="Quận/Huyện"
-                                        variant="outlined"
-                                        name="district"
-                                        formik={formik}
-                                    />
-                                )}
-                            />
-                        </Grid>
-                        <Grid item xs={4}>
-                            <Autocomplete
-                                options={wards}
-                                onBlur={formik.handleBlur}
-                                getOptionLabel={(option) => option.name}
-                                isOptionEqualToValue={(option, value) =>
-                                    value?.code === option?.code
-                                }
-                                onChange={(event, value) => {
-                                    handleChangeWard(value);
-                                }}
-                                value={selectedWard || null}
-                                renderInput={(params) => (
-                                    <GTextFieldNormal
-                                        {...params}
-                                        label="Xã/Phường"
-                                        variant="outlined"
-                                        name="ward"
-                                        formik={formik}
-                                    />
-                                )}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <GTextFieldNormal
-                                onChange={formik.handleChange}
-                                label="Địa chỉ chi tiết"
-                                fullWidth
-                                name="detail_address"
-                                value={formik.values?.detail_address || ""}
-                                formik={formik}
-                            />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                            <GTextFieldNormal
-                                onChange={formik.handleChange}
                                 password={true}
                                 label="Mật khẩu"
                                 fullWidth
                                 name="password"
                                 value={formik.values?.password || ""}
                                 formik={formik}
+                                InputLabelProps={{ shrink: true }}
                             />
                         </Grid>
                         <Grid item xs={6}>
@@ -418,6 +329,7 @@ export default function CreateUpdateAdminUserModal({
                                 name="confirmPassword"
                                 value={formik.values?.confirmPassword || ""}
                                 formik={formik}
+                                InputLabelProps={{ shrink: true }}
                             />
                         </Grid>
 

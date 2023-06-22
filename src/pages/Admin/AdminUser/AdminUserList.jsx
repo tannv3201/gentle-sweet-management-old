@@ -14,6 +14,7 @@ import { LightTooltip } from "../../../components/GTooltip/GTooltip";
 import { getAllUser } from "../../../redux/api/apiAdminUser";
 import CreateUpdateAdminUserModal from "./CreateUpdateAdminUserModal";
 import DeleteAdminUserPopup from "./DeleteAdminUserPopup";
+import { getAllBranch } from "../../../redux/api/apiBranch";
 export default function AdminUserList({ data }) {
     const user = useSelector((state) => state.auth.login?.currentUser);
     const [cloneData, setCloneData] = useState([]);
@@ -26,6 +27,7 @@ export default function AdminUserList({ data }) {
     const adminUserList = useSelector(
         (state) => state.adminUser.adminUser?.allAdminUser
     );
+    const branchList = useSelector((state) => state.branch.branch?.branchList);
 
     useEffect(() => {
         if (!user) {
@@ -34,10 +36,14 @@ export default function AdminUserList({ data }) {
         if (user?.accessToken && adminUserList?.length === 0) {
             getAllUser(user?.accessToken, dispatch, axiosJWT);
         }
+        if (branchList?.length === 0) {
+            getAllBranch(dispatch);
+        }
     }, []);
 
     useEffect(() => {
         const newList = adminUserList?.map((user) => {
+            const branch = branchList?.find((b) => b.id === user?.branch_id);
             return {
                 ...user,
                 role_name:
@@ -47,6 +53,7 @@ export default function AdminUserList({ data }) {
                         ? "STAFF"
                         : "",
                 fullName: user?.last_name + " " + user?.first_name,
+                branchName: branch?.name,
             };
         });
 
@@ -72,7 +79,7 @@ export default function AdminUserList({ data }) {
     const handleOpenDeleteConfirmModal = (rowData) => {
         setSelectedUser({
             id: rowData?.id,
-            fullName: rowData?.last_name + " " + rowData?.first_name,
+            fullName: rowData?.name,
         });
         setIsOpenDeleteConfirmModel(true);
     };
@@ -95,7 +102,8 @@ export default function AdminUserList({ data }) {
             <GTable
                 title={"DANH SÁCH NGƯỜI DÙNG HỆ THỐNG"}
                 columns={[
-                    { title: "Họ và tên", field: "fullName" },
+                    { title: "Tên tài khoản", field: "name" },
+                    { title: "Cơ sở", field: "branchName" },
                     { title: "Email", field: "email" },
                     { title: "Quyền hạn", field: "role_name" },
                     {

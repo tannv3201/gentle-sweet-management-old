@@ -25,6 +25,7 @@ import ForgotPassword from "../pages/ForgotPassword/ForgotPassword";
 import VerifyCode from "../pages/ForgotPassword/VerifyCode";
 import PasswordChange from "../pages/ForgotPassword/PasswordChange";
 import VerifyEmail from "../pages/SignUp/VerifyEmail";
+import Branch from "../pages/Admin/Branch/Branch";
 
 // public routes
 
@@ -163,6 +164,12 @@ export const privateRoutes = [
         component: ProductCategory,
         layout: AdminLayout,
         role: 2,
+    },
+    {
+        path: "/branch",
+        component: Branch,
+        layout: AdminLayout,
+        role: 1,
     },
     {
         path: "/service-category",

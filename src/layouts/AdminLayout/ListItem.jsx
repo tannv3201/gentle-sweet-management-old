@@ -28,6 +28,13 @@ export const MainListItems = () => {
             />
             {user?.role_id === 1 && (
                 <MenuItem
+                    to={"/branch"}
+                    title={"Chi nhánh"}
+                    icon={<People />}
+                />
+            )}
+            {user?.role_id === 1 && (
+                <MenuItem
                     to={"/admin-user"}
                     title={"Nhân viên"}
                     icon={<People />}

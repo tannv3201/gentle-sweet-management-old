@@ -41,7 +41,6 @@ export default function AdminUserDetail() {
     const getAdminUser = useSelector(
         (state) => state.adminUser.adminUser?.adminUser
     );
-
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [selectedProvince, setSelectedProvince] = useState(null);
@@ -70,15 +69,8 @@ export default function AdminUserDetail() {
         id: "",
         role_id: "",
         role_name: "",
-        birth_date: "",
         email: "",
-        phone_number: "",
-        first_name: "",
-        last_name: "",
-        province: "",
-        district: "",
-        ward: "",
-        detail_address: "",
+        name: "",
         password: "",
         confirmPassword: "",
     });
@@ -99,27 +91,10 @@ export default function AdminUserDetail() {
     const phoneRegExp = /(84|0[3|5|7|8|9])+([0-9]{8})\b/;
     const validationSchema = Yup.object().shape({
         role_id: Yup.string().required("Vui lòng không để trống"),
-        first_name: Yup.string().required("Vui lòng không để trống"),
-        phone_number: Yup.string()
-            .matches(/^\d+$/, "Số điện thoại chỉ bao gồm các ký tự số")
-            .matches(phoneRegExp, "Số điện thoại không hợp lệ")
-            .required("Vui lòng nhập số điện thoại"),
-        last_name: Yup.string().required("Vui lòng không để trống"),
+        name: Yup.string().required("Vui lòng không để trống"),
         email: Yup.string()
             .email("Vui lòng nhập địa chỉ email hợp lệ")
             .required("Vui lòng không để trống"),
-        province: Yup.string().required("Vui lòng không để trống"),
-        district: Yup.string().required("Vui lòng không để trống"),
-        ward: Yup.string().required("Vui lòng không để trống"),
-        detail_address: Yup.string().required("Vui lòng không để trống"),
-        birth_date: Yup.date()
-            .required("Vui lòng nhập ngày sinh")
-            .typeError("Ngày không hợp lệ")
-            .max(new Date(), "Ngày sinh không được lớn hơn ngày hiện tại")
-            .min(
-                new Date("1900-01-01"),
-                "Ngày sinh không được nhỏ hơn 01/01/1900"
-            ),
     });
 
     const formik = useFormik({
@@ -132,130 +107,17 @@ export default function AdminUserDetail() {
                 password,
                 role_name,
                 editState,
+                branch,
+                id,
                 ...restData
             } = data;
             const dataFinal = {
                 ...restData,
-                birth_date: dayjs
-                    .utc(data?.birth_date)
-                    .utcOffset("+07:00")
-                    .format("YYYY/MM/DD"),
+                branch_id: branch?.id,
             };
             handleUpdateAdminUser(dataFinal);
         },
     });
-    // State PROVINCE LIST - DISTRICT LIST - WARD LIST
-    const [provinces, setProvinces] = useState([]);
-    const [districts, setDistricts] = useState([]);
-    const [wards, setWards] = useState([]);
-
-    const getProvinceList = structuredClone(
-        useSelector((state) => state.province.province.provinceList)
-    );
-
-    // Get province list from API
-    useEffect(() => {
-        setProvinces(getProvinceList);
-    }, []);
-
-    // Fn handle province onChange event
-    const handleProvinceChange = async (event, value) => {
-        setSelectedProvince(value);
-        setSelectedDistrict(null);
-        setSelectedWard(null);
-        formik.setFieldValue("province", value?.code);
-
-        if (value) {
-            await districtApi(value?.code).then((districts) => {
-                setDistricts(districts);
-            });
-        } else {
-            setDistricts([]);
-            formik.setFieldValue("province", null);
-            formik.setFieldValue("district", null);
-            formik.setFieldValue("ward", null);
-        }
-    };
-
-    // Fn handle district onChange event
-    const handleDistrictChange = async (event, value) => {
-        setSelectedDistrict(value);
-        setSelectedWard(null);
-        formik.setFieldValue("district", value?.code);
-
-        if (value) {
-            await wardApi(value?.code).then((wards) => {
-                setWards(wards);
-            });
-        } else {
-            setWards([]);
-            formik.setFieldValue("district", null);
-            formik.setFieldValue("ward", null);
-        }
-    };
-
-    // Fn handle ward onChange event
-    const handleChangeWard = (value) => {
-        if (value) {
-            setSelectedWard(value);
-            formik.setFieldValue("ward", value?.code);
-        } else {
-            formik.setFieldValue("ward", null);
-        }
-    };
-
-    // Set selected province/district/ward into states & Formik field
-    useEffect(() => {
-        const fetch = async () => {
-            if (cloneData) {
-                const provinceSelected = getProvinceById(
-                    cloneData?.province,
-                    provinces
-                );
-                setSelectedProvince(provinceSelected);
-                formik.setFieldValue("province", provinceSelected?.code);
-                // District
-                await districtApi(parseInt(getAdminUser?.province)).then(
-                    (districtList) => {
-                        const districtSelected = getDistrictById(
-                            cloneData?.district,
-                            districtList
-                        );
-                        setSelectedDistrict(districtSelected);
-                        setDistricts(districtList);
-                        formik.setFieldValue(
-                            "district",
-                            districtSelected?.code
-                        );
-                    }
-                );
-
-                await wardApi(parseInt(getAdminUser?.district)).then(
-                    (wardList) => {
-                        const wardSelected = getWardById(
-                            cloneData?.ward,
-                            wardList
-                        );
-                        setSelectedWard(wardSelected);
-                        setWards(wardList);
-                        formik.setFieldValue("ward", wardSelected?.code);
-                    }
-                );
-            }
-        };
-
-        fetch();
-    }, [cloneData]);
-
-    // Fn handle birthdate onChange
-    const handleChangeBirthDate = (value) => {
-        if (value) {
-            formik.setFieldValue("birth_date", value);
-        } else {
-            formik.setFieldValue("birth_date", null);
-        }
-        formik.validateField("birth_date");
-    };
 
     const handleChangeRole = (data) => {
         if (data) {
@@ -266,33 +128,37 @@ export default function AdminUserDetail() {
             formik.setFieldValue("role_name", null);
         }
     };
+    const handleChangeBranch = (data) => {
+        if (data) {
+            formik.setFieldValue("branch", { id: data?.id, name: data?.name });
+        } else {
+            formik.setFieldValue("branch", null);
+        }
+    };
+    const branchList = useSelector((state) => state.branch.branch?.branchList);
 
     useEffect(() => {
-        if (cloneData)
+        if (cloneData) {
+            const branch = branchList?.find(
+                (b) => b.id === cloneData?.branch_id
+            );
             setAdminUser({
-                id: cloneData.id,
-                role_id: cloneData.role_id || null,
+                id: cloneData?.id,
+                role_id: cloneData?.role_id || null,
                 role_name:
-                    cloneData.role_id === 2
+                    cloneData?.role_id === 2
                         ? "ADMIN"
-                        : cloneData.role_id === 3
+                        : cloneData?.role_id === 3
                         ? "STAFF"
                         : "",
-                username: cloneData.username,
-                last_name: cloneData.last_name,
-                first_name: cloneData.first_name,
-                phone_number: cloneData?.phone_number,
-                province: cloneData?.province,
-                district: cloneData?.district,
-                ward: cloneData?.ward,
-                detail_address: cloneData?.detail_address,
-                birth_date: cloneData?.birth_date
-                    ? dayjs(cloneData?.birth_date)
-                    : null,
+                name: cloneData?.name,
+                branch_id: cloneData?.branch_id,
+                branch: branch,
                 email: cloneData.email,
                 password: "",
                 confirmPassword: "",
             });
+        }
     }, [cloneData]);
 
     useEffect(() => {
@@ -391,48 +257,42 @@ export default function AdminUserDetail() {
                                 />
                             </Grid>
                             <Grid item xs={6}>
-                                <GDatePicker
+                                <Autocomplete
                                     disabled={!isEditting}
-                                    label={"Ngày sinh"}
+                                    options={branchList}
+                                    getOptionLabel={(option) =>
+                                        `${option?.name}` || ""
+                                    }
+                                    onChange={(e, value) => {
+                                        handleChangeBranch(value);
+                                    }}
                                     onBlur={formik.handleBlur}
-                                    fullWidth
-                                    name="birth_date"
-                                    onChange={(date) =>
-                                        handleChangeBirthDate(date)
+                                    isOptionEqualToValue={(option, value) =>
+                                        value === null ||
+                                        value === "" ||
+                                        option?.id === value?.id
                                     }
-                                    value={formik.values?.birth_date || null}
-                                    formik={formik}
-                                    error={
-                                        formik?.touched?.birth_date &&
-                                        Boolean(formik?.errors?.birth_date)
-                                    }
-                                    helperText={
-                                        formik?.touched?.birth_date &&
-                                        formik?.errors?.birth_date
-                                    }
-                                    inputLabelProps={{ shrink: true }}
+                                    value={formik.values?.branch || null}
+                                    renderInput={(params) => (
+                                        <GTextFieldNormal
+                                            {...params}
+                                            name="branch_id"
+                                            fullWidth
+                                            label="Cơ sở"
+                                            formik={formik}
+                                            InputLabelProps={{ shrink: true }}
+                                        />
+                                    )}
                                 />
                             </Grid>
                             <Grid item xs={6}>
                                 <GTextFieldNormal
                                     disabled={!isEditting}
                                     onChange={formik.handleChange}
-                                    label="Họ"
+                                    label="Tên tài khoản"
                                     fullWidth
-                                    name="last_name"
-                                    value={formik.values?.last_name || ""}
-                                    formik={formik}
-                                    InputLabelProps={{ shrink: true }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <GTextFieldNormal
-                                    disabled={!isEditting}
-                                    onChange={formik.handleChange}
-                                    label="Tên"
-                                    fullWidth
-                                    name="first_name"
-                                    value={formik.values?.first_name || ""}
+                                    name="name"
+                                    value={formik.values?.name || ""}
                                     formik={formik}
                                     InputLabelProps={{ shrink: true }}
                                 />
@@ -453,104 +313,6 @@ export default function AdminUserDetail() {
                                             </InputAdornment>
                                         ),
                                     }}
-                                    InputLabelProps={{ shrink: true }}
-                                />
-                            </Grid>
-                            <Grid item xs={6}>
-                                <GTextFieldNormal
-                                    disabled={!isEditting}
-                                    onChange={formik.handleChange}
-                                    label="Số điện thoại"
-                                    fullWidth
-                                    name="phone_number"
-                                    value={formik.values?.phone_number || ""}
-                                    formik={formik}
-                                    InputLabelProps={{ shrink: true }}
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <Autocomplete
-                                    disabled={!isEditting}
-                                    options={provinces}
-                                    onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) => option.name}
-                                    isOptionEqualToValue={(option, value) =>
-                                        value?.code === option?.code
-                                    }
-                                    onChange={handleProvinceChange}
-                                    value={selectedProvince || null}
-                                    renderInput={(params) => (
-                                        <GTextFieldNormal
-                                            {...params}
-                                            disabled={!isEditting}
-                                            label="Tỉnh/Thành phố"
-                                            variant="outlined"
-                                            name="province"
-                                            formik={formik}
-                                            InputLabelProps={{ shrink: true }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <Autocomplete
-                                    disabled={!isEditting}
-                                    options={districts}
-                                    onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) => option.name}
-                                    isOptionEqualToValue={(option, value) =>
-                                        value?.code === option?.code
-                                    }
-                                    onChange={handleDistrictChange}
-                                    value={selectedDistrict || null}
-                                    renderInput={(params) => (
-                                        <GTextFieldNormal
-                                            {...params}
-                                            disabled={!isEditting}
-                                            label="Quận/Huyện"
-                                            variant="outlined"
-                                            name="district"
-                                            formik={formik}
-                                            InputLabelProps={{ shrink: true }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <Autocomplete
-                                    disabled={!isEditting}
-                                    options={wards}
-                                    onBlur={formik.handleBlur}
-                                    getOptionLabel={(option) => option.name}
-                                    isOptionEqualToValue={(option, value) =>
-                                        value?.code === option?.code
-                                    }
-                                    onChange={(event, value) => {
-                                        handleChangeWard(value);
-                                    }}
-                                    value={selectedWard || null}
-                                    renderInput={(params) => (
-                                        <GTextFieldNormal
-                                            {...params}
-                                            disabled={!isEditting}
-                                            label="Xã/Phường"
-                                            variant="outlined"
-                                            name="ward"
-                                            formik={formik}
-                                            InputLabelProps={{ shrink: true }}
-                                        />
-                                    )}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <GTextFieldNormal
-                                    disabled={!isEditting}
-                                    onChange={formik.handleChange}
-                                    label="Địa chỉ chi tiết"
-                                    fullWidth
-                                    name="detail_address"
-                                    value={formik.values?.detail_address || ""}
-                                    formik={formik}
                                     InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
