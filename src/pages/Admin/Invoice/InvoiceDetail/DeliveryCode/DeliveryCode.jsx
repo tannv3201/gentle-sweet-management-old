@@ -21,6 +21,7 @@ export default function DeliveryCodePopup({ handleOpen, isOpen, ...props }) {
     const deliveryByInvoiceId = useSelector(
         (state) => state.delivery.delivery?.deliveryByInvoiceId
     );
+
     // Initial Formik state
     const [deliveryCode, setDeliveryCode] = useState({
         delivery_code: "",
@@ -43,7 +44,7 @@ export default function DeliveryCodePopup({ handleOpen, isOpen, ...props }) {
                 delivery_unit: deliveryByInvoiceId?.delivery_unit,
             });
         }
-    }, [deliveryByInvoiceId?.delivery_unit, invoiceId]);
+    }, [deliveryByInvoiceId, deliveryByInvoiceId?.delivery_unit]);
 
     // Create useFormik
     const formik = useFormik({
@@ -58,9 +59,8 @@ export default function DeliveryCodePopup({ handleOpen, isOpen, ...props }) {
                 data,
                 axiosJWT,
                 invoiceId
-            ).then(() => {
-                handleCloseModal();
-            });
+            );
+            handleCloseModal();
         },
     });
 

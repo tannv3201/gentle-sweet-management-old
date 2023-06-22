@@ -25,6 +25,14 @@ import { getBookingDetailByBookingId } from "../../../../redux/api/apiBookingDet
 import { getBookingById } from "../../../../redux/api/apiBooking";
 import BookingCustomerInfo from "./BookingCustomerInfo/BookingCustomerInfo";
 import BookingServiceInfo from "./BookingServiceInfo/BookingServiceInfo";
+import { getAllBranch } from "../../../../redux/api/apiBranch";
+import {
+    districtApi,
+    getDistrictById,
+    getProvinceById,
+    getWardById,
+    wardApi,
+} from "../../../../redux/api/apiProvinceOpenAPI";
 
 const cx = classNames.bind(styles);
 
@@ -50,29 +58,77 @@ export default function BookingDetail() {
     const getBookingDetail = useSelector(
         (state) => state.bookingDetail.bookingDetail?.bookingDetailByBooking
     );
-
+    const getBranchList = useSelector(
+        (state) => state.branch.branch?.branchList
+    );
+    const getProvinceList = structuredClone(
+        useSelector((state) => state.province.province.provinceList)
+    );
     useEffect(() => {
-        setCurrBooking(
-            structuredClone({
-                ...getBooking,
-                statusName:
-                    getBooking?.status === 1
-                        ? "Chờ tiếp nhận"
-                        : getBooking?.status === 2
-                        ? "Đã tiếp nhận"
-                        : getBooking?.status === 3
-                        ? "Đã lên lịch"
-                        : getBooking?.status === 4
-                        ? "Bắt đầu dịch vụ"
-                        : getBooking?.status === 5
-                        ? "Đã hoàn thành"
-                        : getBooking?.status === 6
-                        ? "Đã hủy"
-                        : getBooking?.status === 7
-                        ? "Yêu cầu hủy lịch hẹn"
-                        : "",
-            })
-        );
+        const fetch = async () => {
+            if (getBooking) {
+                let provinceName;
+                let districtName;
+                let wardName;
+                const branch = getBranchList?.find(
+                    (b) => b?.id === getBooking?.branch_id
+                );
+                const provinceSelected = getProvinceById(
+                    branch?.province,
+                    getProvinceList
+                );
+                provinceName = provinceSelected?.name;
+                // District
+
+                await districtApi(parseInt(branch?.province)).then(
+                    (districtList) => {
+                        const districtSelected = getDistrictById(
+                            branch?.district,
+                            districtList
+                        );
+                        districtName = districtSelected?.name;
+                    }
+                );
+
+                await wardApi(parseInt(branch?.district)).then((wardList) => {
+                    const wardSelected = getWardById(branch?.ward, wardList);
+                    wardName = wardSelected?.name;
+                });
+
+                setCurrBooking(
+                    structuredClone({
+                        ...getBooking,
+                        statusName:
+                            getBooking?.status === 1
+                                ? "Chờ tiếp nhận"
+                                : getBooking?.status === 2
+                                ? "Đã tiếp nhận"
+                                : getBooking?.status === 3
+                                ? "Đã lên lịch"
+                                : getBooking?.status === 4
+                                ? "Bắt đầu dịch vụ"
+                                : getBooking?.status === 5
+                                ? "Đã hoàn thành"
+                                : getBooking?.status === 6
+                                ? "Đã hủy"
+                                : getBooking?.status === 7
+                                ? "Yêu cầu hủy lịch hẹn"
+                                : "",
+                        branch_name: branch?.name,
+                        branch_address:
+                            branch?.detail_address +
+                            ", " +
+                            wardName +
+                            ", " +
+                            districtName +
+                            ", " +
+                            provinceName,
+                        branch_phone_number: branch?.phone_number,
+                    })
+                );
+            }
+        };
+        fetch();
     }, [getBooking]);
 
     useEffect(() => {
@@ -105,6 +161,9 @@ export default function BookingDetail() {
                 ).then((invoiceCreator) => {
                     setCurrBookingCreator(structuredClone(invoiceCreator));
                 });
+            }
+            if (getBranchList?.length === 0) {
+                await getAllBranch(dispatch);
             }
         };
 
@@ -181,14 +240,7 @@ export default function BookingDetail() {
                     currBooking={currBooking}
                     currCustomerUser={currCustomerUser}
                 />
-                <BookingServiceInfo
-                    currBooking={{
-                        ...currBooking,
-                        branch_id: getBookingDetail[0]?.branch_id,
-                    }}
-                    currCustomerUser={currCustomerUser}
-                    currBookingCreator={currBookingCreator}
-                />
+                <BookingServiceInfo currBooking={currBooking} />
                 <BookingDetailList isEditting={isEditting} />
                 <ConfirmPopup
                     isOpen={isOpenConfirmBooking}

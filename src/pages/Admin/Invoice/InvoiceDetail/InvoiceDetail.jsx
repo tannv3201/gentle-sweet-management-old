@@ -158,7 +158,6 @@ export default function InvoiceDetail() {
     const handleCloseCancelInvoice = () => {
         setIsOpenCancelInvoice(false);
     };
-    console.log(currInvoice);
 
     return (
         <>

@@ -25,7 +25,6 @@ export default function CreateUpdateBranchModal({
     selectedBranch,
     ...props
 }) {
-    console.log(selectedBranch);
     const user = useSelector((state) => state.auth.login?.currentUser);
     const dispatch = useDispatch();
     const [branch, setProductCategory] = useState({
@@ -81,10 +80,7 @@ export default function CreateUpdateBranchModal({
         onSubmit: (data) => {
             if (data?.id) {
                 handleUpdateBranch(data);
-                console.log(data);
             } else {
-                console.log(data);
-
                 handleCreateBranch({
                     ...data,
                     admin_user_id: user?.id,

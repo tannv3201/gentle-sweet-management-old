@@ -18,7 +18,6 @@ function ConfirmCancelInvoiceRequestPopup({
     const user = useSelector((state) => state.auth.login?.currentUser);
     const dispatch = useDispatch();
     let axiosJWT = createAxios(user, dispatch, loginSuccess);
-    console.log(currInvoice);
     const handleCancelInvoice = async () => {
         await updateInvoice(
             user?.accessToken,

@@ -132,7 +132,7 @@ function FilterInvoice({ isFiltering, setIsFiltering }) {
             >
                 <div className={cx("search-box")}>
                     <Grid container spacing={2}>
-                        <Grid item xs={3}>
+                        <Grid item xs={4}>
                             <Autocomplete
                                 options={invoiceStatus}
                                 getOptionLabel={(option) =>
@@ -165,7 +165,7 @@ function FilterInvoice({ isFiltering, setIsFiltering }) {
                                 )}
                             />
                         </Grid>
-                        <Grid item xs={3}>
+                        {/* <Grid item xs={3}>
                             <Autocomplete
                                 options={customerUserList}
                                 getOptionLabel={(option) =>
@@ -209,8 +209,8 @@ function FilterInvoice({ isFiltering, setIsFiltering }) {
                                     />
                                 )}
                             />
-                        </Grid>
-                        <Grid item xs={3}>
+                        </Grid> */}
+                        <Grid item xs={4}>
                             <GDatePicker
                                 label={"Từ ngày"}
                                 fullWidth
@@ -223,7 +223,7 @@ function FilterInvoice({ isFiltering, setIsFiltering }) {
                                 value={startDate ? dayjs(startDate) : null}
                             />
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={4}>
                             <GDatePicker
                                 label={"Đến ngày"}
                                 fullWidth

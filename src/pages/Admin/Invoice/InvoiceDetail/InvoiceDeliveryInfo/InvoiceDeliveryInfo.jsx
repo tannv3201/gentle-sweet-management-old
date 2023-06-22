@@ -162,8 +162,7 @@ function InvoiceDeliveryInfo({
                             label={"Nhân viên xác nhận"}
                             content={
                                 currInvoice?.admin_user_id
-                                    ? `${getAdminUser?.last_name} 
-                                      ${getAdminUser?.first_name}`
+                                    ? getAdminUser?.name
                                     : "--"
                             }
                         />
@@ -268,7 +267,7 @@ function InvoiceDeliveryInfo({
                                 label={"Phương thức thanh toán"}
                                 content={currInvoice?.paymentMethodName}
                             />
-                            {currInvoice?.payment_method > 1 ? (
+                            {currInvoice?.payment_method > 1 && (
                                 <div>
                                     <LightTooltip
                                         title={
@@ -295,8 +294,6 @@ function InvoiceDeliveryInfo({
                                         )}
                                     </LightTooltip>
                                 </div>
-                            ) : (
-                                "--"
                             )}
                         </div>
                     </Grid>

@@ -35,13 +35,8 @@ function InfoItem({ label, content }) {
     );
 }
 
-function BookingServiceInfo({
-    currBooking,
-    currCustomerUser,
-    currBookingCreator,
-}) {
+function BookingServiceInfo({ currBooking }) {
     const { bookingId } = useParams();
-
     const [bookingDetailClone, setBookingDetailClone] = useState({});
     const getBookingDetail = useSelector(
         (state) => state.bookingDetail.bookingDetail?.bookingDetailByBooking
@@ -70,14 +65,7 @@ function BookingServiceInfo({
 
     const dispatch = useDispatch();
     let axiosJWT = createAxios(user, dispatch, loginSuccess);
-    const branchList = useSelector((state) => state.branch.branch?.branchList);
-    const [bookingBranch, setBookingBranch] = useState({});
-    const getProvinceList = structuredClone(
-        useSelector((state) => state.province.province.provinceList)
-    );
-    const [selectedProvince, setSelectedProvince] = useState("");
-    const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [selectedWard, setSelectedWard] = useState("");
+
     useEffect(() => {
         const fetch = async () => {
             if (currBooking?.admin_user_id) {
@@ -88,40 +76,6 @@ function BookingServiceInfo({
                     axiosJWT
                 );
             }
-            if (branchList?.length === 0) {
-                await getAllBranch(dispatch);
-            }
-            const getBranchInBooking = branchList?.find(
-                (b) => b.id === currBooking?.branch_id
-            );
-            setBookingBranch(getBranchInBooking);
-
-            const provinceSelected = getProvinceById(
-                getBranchInBooking?.province,
-                getProvinceList
-            );
-            setSelectedProvince(provinceSelected?.name);
-            // District
-
-            await districtApi(parseInt(getBranchInBooking?.province)).then(
-                (districtList) => {
-                    const districtSelected = getDistrictById(
-                        getBranchInBooking?.district,
-                        districtList
-                    );
-                    setSelectedDistrict(districtSelected?.name);
-                }
-            );
-
-            await wardApi(parseInt(getBranchInBooking?.district)).then(
-                (wardList) => {
-                    const wardSelected = getWardById(
-                        getBranchInBooking?.ward,
-                        wardList
-                    );
-                    setSelectedWard(wardSelected?.name);
-                }
-            );
         };
         fetch();
     }, [bookingId, currBooking?.admin_user_id]);
@@ -177,19 +131,19 @@ function BookingServiceInfo({
                     <Grid item xs={12}>
                         <InfoItem
                             label={"Tên chi nhánh"}
-                            content={bookingBranch?.name}
+                            content={currBooking?.branch_name}
                         />
                     </Grid>
                     <Grid item xs={12}>
                         <InfoItem
                             label={"Địa chỉ chi nhánh"}
-                            content={`${bookingBranch?.detail_address}, ${selectedWard}, ${selectedDistrict}, ${selectedProvince}`}
+                            content={currBooking?.branch_address}
                         />
                     </Grid>
                     <Grid item xs={12}>
                         <InfoItem
                             label={"Số điện thoại liên hệ"}
-                            content={bookingBranch?.phone_number}
+                            content={currBooking?.branch_phone_number}
                         />
                     </Grid>
                     <Grid item xs={6}>

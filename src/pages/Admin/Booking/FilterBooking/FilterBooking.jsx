@@ -132,7 +132,7 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
             >
                 <div className={cx("search-box")}>
                     <Grid container spacing={2}>
-                        <Grid item xs={3}>
+                        <Grid item xs={4}>
                             <Autocomplete
                                 options={bookingStatus}
                                 getOptionLabel={(option) =>
@@ -164,7 +164,7 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
                                 )}
                             />
                         </Grid>
-                        <Grid item xs={3}>
+                        {/* <Grid item xs={3}>
                             <Autocomplete
                                 options={customerUserList}
                                 getOptionLabel={(option) =>
@@ -207,8 +207,8 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
                                     />
                                 )}
                             />
-                        </Grid>
-                        <Grid item xs={3}>
+                        </Grid> */}
+                        <Grid item xs={4}>
                             <GDatePicker
                                 label={"Từ ngày"}
                                 fullWidth
@@ -221,9 +221,9 @@ export default function FilterBooking({ isFiltering, setIsFiltering }) {
                                 value={startDate ? dayjs(startDate) : null}
                             />
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={4}>
                             <GDatePicker
-                                label={"Từ ngày"}
+                                label={"Đến ngày"}
                                 fullWidth
                                 name="birth_date"
                                 onChange={(date) =>

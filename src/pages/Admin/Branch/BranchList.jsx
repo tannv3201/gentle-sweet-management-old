@@ -76,7 +76,6 @@ export default function Branch({ data }) {
                                 districtList
                             );
                             districtName = districtSelected?.name;
-                            console.log(districtName);
                         }
                     );
 
