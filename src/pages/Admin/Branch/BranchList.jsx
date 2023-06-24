@@ -128,7 +128,7 @@ export default function Branch({ data }) {
             <br />
             <br />
             <GTable
-                title={"DANH MỤC CHI NHÁNH"}
+                title={"DANH SÁCH CHI NHÁNH"}
                 columns={[
                     { title: "Tên chi nhánh", field: "name" },
                     {
